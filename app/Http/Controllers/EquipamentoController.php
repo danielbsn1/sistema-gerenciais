@@ -1,94 +1,76 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Equipamento;
+use Illuminate\Http\Request;
 
 class EquipamentoController extends Controller
 {
-    // Lista todos os equipamentos
-    public function index()
+    public function index(Request $request)
     {
-        $equipamentos = Equipamento::all();
+        $query = Equipamento::with('emprestimoAtivo.funcionario');
+
+        if ($request->tipo)   $query->where('tipo', $request->tipo);
+        if ($request->status) $query->where('status', $request->status);
+        if ($request->busca)  $query->where(function($q) use ($request) {
+            $q->where('patrimonio_id', 'like', "%{$request->busca}%")
+              ->orWhere('marca', 'like', "%{$request->busca}%")
+              ->orWhere('modelo', 'like', "%{$request->busca}%");
+        });
+
+        $equipamentos = $query->orderBy('tipo')->get();
+
         return view('equipamentos.index', compact('equipamentos'));
     }
 
-    // Mostra o formulário para criar
     public function create()
     {
         return view('equipamentos.create');
     }
 
-    // Salva um novo equipamento
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'patrimonio_id' => 'required|unique:equipamentos',
-            'tipo' => 'required|string',
-            'marca' => 'required|string',
-            'modelo' => 'nullable|string',
-            'numero_serie' => 'nullable|string',
-            'processador' => 'nullable|string',
-            'memoria_ram' => 'nullable|string',
-            'armazenamento' => 'nullable|string',
-            'sistema_operacional' => 'nullable|string',
-            'resolucao' => 'nullable|string',
-            'tamanho_tela' => 'nullable|string',
-            'data_aquisicao' => 'nullable|date',
-            'valor_aquisicao' => 'nullable|numeric',
-            'nota_fiscal' => 'nullable|string',
-            'status' => 'required|string',
-            'observacoes' => 'nullable|string',
+            'tipo'          => 'required|in:tablet,notebook,desktop,monitor',
+            'marca'         => 'required',
+            'modelo'        => 'required',
         ]);
 
-        Equipamento::create($data);
+        Equipamento::create($request->all());
 
-        return redirect()->route('equipamentos.index')->with('success', 'Equipamento criado com sucesso!');
+        return redirect()->route('equipamentos.index')->with('success', 'Equipamento cadastrado!');
     }
 
-    // Mostra um equipamento específico
     public function show(Equipamento $equipamento)
     {
-        return view('equipamentos.show', compact('equipamento'));
+        $historico = $equipamento->emprestimos()->with('funcionario')->latest()->get();
+        return view('equipamentos.show', compact('equipamento', 'historico'));
     }
 
-    // Mostra o formulário de edição
     public function edit(Equipamento $equipamento)
     {
         return view('equipamentos.edit', compact('equipamento'));
     }
 
-    // Atualiza o equipamento
     public function update(Request $request, Equipamento $equipamento)
     {
-        $data = $request->validate([
+        $request->validate([
             'patrimonio_id' => 'required|unique:equipamentos,patrimonio_id,' . $equipamento->id,
-            'tipo' => 'required|string',
-            'marca' => 'required|string',
-            'modelo' => 'nullable|string',
-            'numero_serie' => 'nullable|string',
-            'processador' => 'nullable|string',
-            'memoria_ram' => 'nullable|string',
-            'armazenamento' => 'nullable|string',
-            'sistema_operacional' => 'nullable|string',
-            'resolucao' => 'nullable|string',
-            'tamanho_tela' => 'nullable|string',
-            'data_aquisicao' => 'nullable|date',
-            'valor_aquisicao' => 'nullable|numeric',
-            'nota_fiscal' => 'nullable|string',
-            'status' => 'required|string',
-            'observacoes' => 'nullable|string',
+            'tipo'          => 'required',
+            'marca'         => 'required',
+            'modelo'        => 'required',
         ]);
 
-        $equipamento->update($data);
+        $equipamento->update($request->all());
 
-        return redirect()->route('equipamentos.index')->with('success', 'Equipamento atualizado com sucesso!');
+        return redirect()->route('equipamentos.show', $equipamento)->with('success', 'Atualizado!');
     }
 
-    // Deleta o equipamento
     public function destroy(Equipamento $equipamento)
     {
         $equipamento->delete();
-        return redirect()->route('equipamentos.index')->with('success', 'Equipamento removido com sucesso!');
+        return redirect()->route('equipamentos.index')->with('success', 'Removido!');
     }
 }

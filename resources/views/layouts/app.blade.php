@@ -1,36 +1,80 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reurb Patrimônio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<div class="flex h-screen overflow-hidden">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl">
+        <div class="p-6 border-b border-gray-700">
+            <h1 class="text-xl font-bold text-blue-400">🏗️ Reurb</h1>
+            <p class="text-xs text-gray-400 mt-1">Gestão de Patrimônio</p>
         </div>
-    </body>
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="{{ route('dashboard') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition
+                      {{ request()->routeIs('dashboard') ? 'bg-blue-600' : '' }}">
+                <i class="fa fa-chart-bar w-5"></i> Dashboard
+            </a>
+            <a href="{{ route('equipamentos.index') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition
+                      {{ request()->routeIs('equipamentos.*') ? 'bg-blue-600' : '' }}">
+                <i class="fa fa-laptop w-5"></i> Equipamentos
+            </a>
+            <a href="{{ route('funcionarios.index') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition
+                      {{ request()->routeIs('funcionarios.*') ? 'bg-blue-600' : '' }}">
+                <i class="fa fa-users w-5"></i> Funcionários
+            </a>
+            <a href="{{ route('emprestimos.index') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition
+                      {{ request()->routeIs('emprestimos.*') ? 'bg-blue-600' : '' }}">
+                <i class="fa fa-exchange-alt w-5"></i> Empréstimos
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-700">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="w-full text-left flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-white transition text-sm">
+                    <i class="fa fa-sign-out-alt"></i> Sair
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 overflow-y-auto">
+        <header class="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-700">@yield('titulo', 'Dashboard')</h2>
+            <span class="text-sm text-gray-500">{{ auth()->user()->name ?? 'Admin' }}</span>
+        </header>
+
+        <div class="p-8">
+            @if(session('success'))
+                <div class="mb-6 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg">
+                    ✅ {{ session('success') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="mb-6 bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg">
+                    <ul class="list-disc list-inside text-sm">
+                        @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @yield('content')
+        </div>
+    </main>
+
+</div>
+
+</body>
 </html>
