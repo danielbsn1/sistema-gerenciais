@@ -31,7 +31,7 @@
 {{-- Equipamentos em Uso --}}
 <div class="bg-white rounded-xl shadow-sm p-6">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold text-gray-700">📋 Equipamentos em Uso</h3>
+        <h3 class="font-semibold text-gray-700"> Equipamentos em Uso</h3>
         <a href="{{ route('emprestimos.create') }}"
            class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
             + Novo Empréstimo

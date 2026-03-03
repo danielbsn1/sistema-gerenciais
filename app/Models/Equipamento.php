@@ -19,7 +19,6 @@ class Equipamento extends Model {
         return $this->hasMany(Emprestimo::class);
     }
 
-    // Com quem está AGORA + dados do funcionário
     public function emprestimoAtivo() {
         return $this->hasOne(Emprestimo::class)
                     ->where('status', 'ativo')

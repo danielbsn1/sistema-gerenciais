@@ -51,7 +51,7 @@
                 <th class="px-5 py-3">Tipo</th>
                 <th class="px-5 py-3">Equipamento</th>
                 <th class="px-5 py-3">Status</th>
-                <th class="px-5 py-3">Com quem está</th>
+                <th class="px-5 py-3">Usuario</th>
                 <th class="px-5 py-3">Ações</th>
             </tr>
         </thead>

@@ -11,10 +11,10 @@
 
 <div class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar -->
+    
     <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl">
         <div class="p-6 border-b border-gray-700">
-            <h1 class="text-xl font-bold text-blue-400">🏗️ Reurb</h1>
+            <h1 class="text-xl font-bold text-blue-400"> VersaReurb</h1>
             <p class="text-xs text-gray-400 mt-1">Gestão de Patrimônio</p>
         </div>
         <nav class="flex-1 p-4 space-y-1">
@@ -49,7 +49,7 @@
         </div>
     </aside>
 
-    <!-- Conteúdo Principal -->
+    
     <main class="flex-1 overflow-y-auto">
         <header class="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-700">@yield('titulo', 'Dashboard')</h2>
@@ -59,7 +59,7 @@
         <div class="p-8">
             @if(session('success'))
                 <div class="mb-6 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg">
-                    ✅ {{ session('success') }}
+                     {{ session('success') }}
                 </div>
             @endif
             @if($errors->any())

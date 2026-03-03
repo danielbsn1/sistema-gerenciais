@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('cpf', 14)->unique();
             $table->string('email')->nullable();
             $table->string('telefone', 20)->nullable();
-            $table->string('setor');              // Campo, TI, Administrativo...
+            $table->string('setor');              
             $table->string('cargo')->nullable();
             $table->string('endereco')->nullable();
             $table->string('cidade')->nullable();

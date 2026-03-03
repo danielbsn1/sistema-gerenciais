@@ -2,63 +2,73 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Funcionario;
 use Illuminate\Http\Request;
 
 class FuncionarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Funcionario::with('emprestimoAtivo.equipamento');
+
+        if ($request->busca) $query->where(function($q) use ($request) {
+            $q->where('nome', 'like', "%{$request->busca}%")
+              ->orWhere('cpf', 'like', "%{$request->busca}%");
+        });
+
+        if ($request->setor) $query->where('setor', 'like', "%{$request->setor}%");
+        if ($request->tipo)  $query->where('tipo', $request->tipo);
+
+        $funcionarios = $query->orderBy('nome')->get();
+
+        return view('funcionarios.index', compact('funcionarios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('funcionarios.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nome'  => 'required',
+            'cpf'   => 'required|unique:funcionarios',
+            'setor' => 'required',
+        ]);
+
+        Funcionario::create($request->all());
+
+        return redirect()->route('funcionarios.index')->with('success', 'Funcionário cadastrado!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Funcionario $funcionario)
     {
-        //
+        $historico = $funcionario->emprestimos()->with('equipamento')->latest()->get();
+        return view('funcionarios.show', compact('funcionario', 'historico'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Funcionario $funcionario)
     {
-        //
+        return view('funcionarios.edit', compact('funcionario'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Funcionario $funcionario)
     {
-        //
+        $request->validate([
+            'nome'  => 'required',
+            'cpf'   => 'required|unique:funcionarios,cpf,' . $funcionario->id,
+            'setor' => 'required',
+        ]);
+
+        $funcionario->update($request->all());
+
+        return redirect()->route('funcionarios.show', $funcionario)->with('success', 'Atualizado!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Funcionario $funcionario)
     {
-        //
+        $funcionario->delete();
+        return redirect()->route('funcionarios.index')->with('success', 'Removido!');
     }
 }
