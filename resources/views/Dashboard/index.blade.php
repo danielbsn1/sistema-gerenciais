@@ -3,7 +3,7 @@
 
 @section('content')
 
-{{-- Cards de Resumo --}}
+
 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     @php
     $cards = [
@@ -28,7 +28,7 @@
     @endforeach
 </div>
 
-{{-- Equipamentos em Uso --}}
+
 <div class="bg-white rounded-xl shadow-sm p-6">
     <div class="flex items-center justify-between mb-4">
         <h3 class="font-semibold text-gray-700"> Equipamentos em Uso</h3>
