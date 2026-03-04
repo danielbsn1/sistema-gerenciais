@@ -5,7 +5,7 @@
 
 <div class="max-w-4xl mx-auto space-y-6">
 
-    {{-- Cabeçalho --}}
+    
     <div class="bg-white rounded-xl shadow-sm p-6 flex justify-between items-start">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">{{ $equipamento->marca }} {{ $equipamento->modelo }}</h2>
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    {{-- Ficha Técnica --}}
+    
     <div class="bg-white rounded-xl shadow-sm p-6">
         <h3 class="font-semibold text-gray-700 mb-4">📋 Ficha Técnica</h3>
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    {{-- Histórico de Empréstimos --}}
+    
     <div class="bg-white rounded-xl shadow-sm p-6">
         <h3 class="font-semibold text-gray-700 mb-4">🔄 Histórico de Empréstimos</h3>
         <table class="w-full text-sm">
