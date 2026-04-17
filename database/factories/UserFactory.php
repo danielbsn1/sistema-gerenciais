@@ -12,8 +12,8 @@ class UserFactory extends Factory
    
     protected static ?string $password;
 
-     @return array<string, 
-     
+
+    
     public function definition(): array
     {
         return [

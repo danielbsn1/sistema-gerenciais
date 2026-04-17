@@ -28,7 +28,7 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-           ,
+           
         ],
 
         'resend' => [
