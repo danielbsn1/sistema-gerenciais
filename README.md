@@ -4,7 +4,7 @@
 
 ##  Sistema de Equipamentos (README)
 
-```markdown
+
 #  Sistema de Gerenciamento de Equipamentos
 
 Sistema web para controle e rastreamento de ativos de TI.
