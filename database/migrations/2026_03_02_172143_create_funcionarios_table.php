@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('uf', 2)->nullable();
             $table->enum('tipo', ['interno', 'prefeitura'])->default('interno');
             $table->boolean('ativo')->default(true);
+            $table->boolean('inativo')->default(false);
             $table->timestamps();
         });
 

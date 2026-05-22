@@ -15,11 +15,18 @@
                class="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-600">Editar</a>
             <a href="{{ route('funcionarios.index') }}"
                class="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-200">Voltar</a>
+            <form action="{{ route('funcionarios.inativar', $funcionario) }}" method="POST">
+                @csrf @method('PATCH')
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg text-sm text-white {{ $funcionario->ativo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600' }}">
+                    {{ $funcionario->ativo ? 'Inativar' : 'Ativar' }}
+                </button>
+            </form>
         </div>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-6">
-        <h3 class="font-semibold text-gray-700 mb-4">👤 Dados Pessoais</h3>
+        <h3 class="font-semibold text-gray-700 mb-4"> Dados Pessoais</h3>
         <div class="grid grid-cols-2 gap-4 text-sm">
             @php
             $campos = [
@@ -42,7 +49,7 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-6">
-        <h3 class="font-semibold text-gray-700 mb-4">🔄 Histórico de Empréstimos</h3>
+        <h3 class="font-semibold text-gray-700 mb-4"> Histórico de Empréstimos</h3>
         <table class="w-full text-sm">
             <thead class="bg-gray-50">
                 <tr class="text-left text-gray-500">

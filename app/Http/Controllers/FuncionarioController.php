@@ -66,6 +66,13 @@ class FuncionarioController extends Controller
         return redirect()->route('funcionarios.show', $funcionario)->with('success', 'Atualizado!');
     }
 
+    public function inativar(Funcionario $funcionario)
+    {
+        $funcionario->update(['ativo' => !$funcionario->ativo]);
+        $status = $funcionario->ativo ? 'ativado' : 'inativado';
+        return back()->with('success', "Funcionário {$status}!");
+    }
+
     public function destroy(Funcionario $funcionario)
     {
         $funcionario->delete();

@@ -16,10 +16,11 @@ class DashboardController extends Controller
             'em_uso'       => Equipamento::where('status', 'em_uso')->count(),
             'manutencao'   => Equipamento::where('status', 'manutencao')->count(),
             'funcionarios' => Funcionario::where('ativo', true)->count(),
+            'funcionarios_inativos' => Funcionario::where('inativo', true)->count(),
         ];
 
         $emprestimos_recentes = Emprestimo::with(['equipamento', 'funcionario'])
-                                          ->where('status', 'ativo')
+                                          ->where('status', 'ativo','inativo')
                                           ->latest()
                                           ->take(10)
                                           ->get();

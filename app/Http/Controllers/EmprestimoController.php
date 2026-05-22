@@ -25,7 +25,7 @@ class EmprestimoController extends Controller
     public function create()
     {
         $equipamentos = Equipamento::where('status', 'disponivel')->get();
-        $funcionarios = Funcionario::where('ativo', true)->orderBy('nome')->get();
+        $funcionarios = Funcionario::where('ativo', true)->orWhere('inativo', true)->orderBy('nome')->get();
         return view('emprestimos.create', compact('equipamentos', 'funcionarios'));
     }
 
@@ -45,7 +45,7 @@ class EmprestimoController extends Controller
         Emprestimo::create([
             'equipamento_id' => $request->equipamento_id,
             'funcionario_id' => $request->funcionario_id,
-            'admin_id'       => auth()->id(),
+            'admin_id'       => auth()->id,
             'data_saida'     => now(),
             'status'         => 'ativo',
             'observacoes'    => $request->observacoes,

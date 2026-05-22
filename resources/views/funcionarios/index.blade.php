@@ -65,9 +65,15 @@
                         <span class="text-gray-400">—</span>
                     @endif
                 </td>
-                <td class="px-5 py-4 flex gap-2">
+                <td class="px-5 py-4 flex gap-2 items-center">
                     <a href="{{ route('funcionarios.show', $func) }}" class="text-blue-500 text-xs">Ver</a>
                     <a href="{{ route('funcionarios.edit', $func) }}" class="text-yellow-500 text-xs">Editar</a>
+                    <form method="POST" action="{{ route('funcionarios.inativar', $func) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="text-xs {{ $func->ativo ? 'text-red-500' : 'text-green-500' }}">
+                            {{ $func->ativo ? 'Inativar' : 'Ativar' }}
+                        </button>
+                    </form>
                 </td>
             </tr>
             @empty

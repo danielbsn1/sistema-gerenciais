@@ -10,7 +10,7 @@ class Funcionario extends Model {
 
     protected $fillable = [
         'nome', 'cpf', 'email', 'telefone',
-        'setor', 'cargo', 'endereco', 'cidade', 'uf', 'tipo', 'ativo'
+        'setor', 'cargo', 'endereco', 'cidade', 'uf', 'tipo', 'ativo', 'inativo'
     ];
 
     public function emprestimos() {
@@ -18,6 +18,6 @@ class Funcionario extends Model {
     }
 
     public function emprestimoAtivo() {
-        return $this->hasOne(Emprestimo::class)->where('status', 'ativo')->latest();
+        return $this->hasOne(Emprestimo::class)->where('status', 'ativo','inativo')->latest();
     }
 }

@@ -69,6 +69,7 @@
                 Salvar
             </button>
             <a href="{{ route('funcionarios.index') }}" class="text-gray-400 text-sm py-2">Cancelar</a>
+            
         </div>
     </form>
 </div>

@@ -21,7 +21,7 @@ class Equipamento extends Model {
 
     public function emprestimoAtivo() {
         return $this->hasOne(Emprestimo::class)
-                    ->where('status', 'ativo')
+                    ->where('status', 'ativo','inativo')
                     ->with('funcionario')
                     ->latest();
     }
