@@ -21,12 +21,12 @@ class FuncionarioController extends Controller
 
         $funcionarios = $query->orderBy('nome')->get();
 
-        return view('funcionarios.index', compact('funcionarios'));
+        return \Inertia\Inertia::render('Funcionarios/Index', ['funcionarios' => $funcionarios]);
     }
 
     public function create()
     {
-        return view('funcionarios.create');
+        return \Inertia\Inertia::render('Funcionarios/Create');
     }
 
     public function store(Request $request)
@@ -45,12 +45,12 @@ class FuncionarioController extends Controller
     public function show(Funcionario $funcionario)
     {
         $historico = $funcionario->emprestimos()->with('equipamento')->latest()->get();
-        return view('funcionarios.show', compact('funcionario', 'historico'));
+        return \Inertia\Inertia::render('Funcionarios/Show', ['funcionario' => $funcionario, 'historico' => $historico]);
     }
 
     public function edit(Funcionario $funcionario)
     {
-        return view('funcionarios.edit', compact('funcionario'));
+        return \Inertia\Inertia::render('Funcionarios/Edit', ['funcionario' => $funcionario]);
     }
 
     public function update(Request $request, Funcionario $funcionario)

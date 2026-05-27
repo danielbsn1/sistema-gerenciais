@@ -21,12 +21,12 @@ class EquipamentoController extends Controller
 
         $equipamentos = $query->orderBy('tipo')->get();
 
-        return view('equipamentos.index', compact('equipamentos'));
+        return \Inertia\Inertia::render('Equipamentos/Index', ['equipamentos' => $equipamentos]);
     }
 
     public function create()
     {
-        return view('equipamentos.create');
+        return \Inertia\Inertia::render('Equipamentos/Create');
     }
 
     public function store(Request $request)
@@ -46,12 +46,12 @@ class EquipamentoController extends Controller
     public function show(Equipamento $equipamento)
     {
         $historico = $equipamento->emprestimos()->with('funcionario')->latest()->get();
-        return view('equipamentos.show', compact('equipamento', 'historico'));
+        return \Inertia\Inertia::render('Equipamentos/Show', ['equipamento' => $equipamento, 'historico' => $historico]);
     }
 
     public function edit(Equipamento $equipamento)
     {
-        return view('equipamentos.edit', compact('equipamento'));
+        return \Inertia\Inertia::render('Equipamentos/Edit', ['equipamento' => $equipamento]);
     }
 
     public function update(Request $request, Equipamento $equipamento)

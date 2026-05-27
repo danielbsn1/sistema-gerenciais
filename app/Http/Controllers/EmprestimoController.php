@@ -19,14 +19,17 @@ class EmprestimoController extends Controller
                                          $q->where('nome', 'like', "%{$request->funcionario}%"));
 
         $emprestimos = $query->latest()->get();
-        return view('emprestimos.index', compact('emprestimos'));
+        return \Inertia\Inertia::render('Emprestimos/Index', ['emprestimos' => $emprestimos]);
     }
 
     public function create()
     {
         $equipamentos = Equipamento::where('status', 'disponivel')->get();
         $funcionarios = Funcionario::where('ativo', true)->orWhere('inativo', true)->orderBy('nome')->get();
-        return view('emprestimos.create', compact('equipamentos', 'funcionarios'));
+        return \Inertia\Inertia::render('Emprestimos/Create', [
+            'equipamentos' => $equipamentos,
+            'funcionarios' => $funcionarios,
+        ]);
     }
 
     public function store(Request $request)

@@ -25,6 +25,9 @@ class DashboardController extends Controller
                                           ->take(10)
                                           ->get();
 
-        return view('dashboard.index', compact('stats', 'emprestimos_recentes'));
+        return \Inertia\Inertia::render('Dashboard/Index', [
+            'stats'               => $stats,
+            'emprestimos_recentes' => $emprestimos_recentes,
+        ]);
     }
 }
