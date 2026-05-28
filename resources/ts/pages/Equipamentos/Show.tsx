@@ -1,11 +1,10 @@
 // resources/ts/pages/Equipamentos/Show.tsx
 import { FC } from "react";
-import AppLayout from "../../layout/Navbar";
+import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
 import { Equipamento, Emprestimo } from "../../types/funcionarios";
-import "../../styles/components.css";
 
 interface Props {
     equipamento: Equipamento;

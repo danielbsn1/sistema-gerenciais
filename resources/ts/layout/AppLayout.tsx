@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 
 type Props = {
     children: React.ReactNode;
+    title?: string;
 };
 
 export default function AppLayout({ children }: Props) {

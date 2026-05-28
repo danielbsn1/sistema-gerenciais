@@ -1,7 +1,5 @@
-// resources/ts/components/Button.tsx
 import { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "react";
 import { Link } from "@inertiajs/react";
-import "../styles/components.css";
 
 type Variant =
     | "primary"

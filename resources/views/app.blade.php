@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css', 'resources/ts/app.tsx'])
+    <meta charset="utf-8">
+
+    @viteReactRefresh
+    @vite('resources/ts/app.tsx')
+
     @inertiaHead
 </head>
+
 <body>
     @inertia
 </body>

@@ -1,7 +1,7 @@
 // resources/ts/pages/Equipamentos/Edit.tsx
 import { FC } from "react";
 import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/Navbar";
+import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import {
     Card,
@@ -10,7 +10,6 @@ import {
     CardFooter,
 } from "../../components/ui/Modal";
 import { Equipamento } from "../../types/funcionarios";
-import "../../styles/components.css";
 
 interface Props {
     equipamento: Equipamento;

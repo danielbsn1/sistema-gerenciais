@@ -1,6 +1,4 @@
-// resources/ts/components/Card.tsx
 import { ReactNode } from "react";
-import "../styles/components.css";
 
 interface CardProps {
     children: ReactNode;
@@ -11,7 +9,7 @@ interface CardProps {
 interface SectionProps {
     children?: ReactNode;
     className?: string;
-    /** Extra element on the right side of the header */
+
     action?: ReactNode;
     title?: string;
     subtitle?: string;

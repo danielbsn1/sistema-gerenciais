@@ -1,6 +1,3 @@
-// =============================================
-// TYPES — VersaReurb
-// =============================================
 
 export type StatusEquipamento = 'disponivel' | 'em_uso' | 'manutencao';
 export type TipoFuncionario   = 'interno' | 'externo';

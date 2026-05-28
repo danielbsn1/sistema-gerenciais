@@ -1,7 +1,7 @@
 // resources/ts/pages/Funcionarios/Create.tsx
 import { FC } from "react";
 import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/Navbar";
+import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import {
     Card,
@@ -9,7 +9,6 @@ import {
     CardBody,
     CardFooter,
 } from "../../components/ui/Modal";
-import "../../styles/components.css";
 
 const FuncionariosCreate: FC = () => {
     const { data, setData, post, processing, errors } = useForm({

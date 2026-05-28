@@ -1,11 +1,10 @@
 // resources/ts/pages/Emprestimos/Index.tsx
 import { FC, useState } from "react";
 import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/Navbar";
+import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Emprestimo } from "../../types/funcionarios";
-import "../../styles/components.css";
 
 interface Props {
     emprestimos: Emprestimo[];
