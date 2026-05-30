@@ -5,15 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Funcionario;
 use Illuminate\Http\Request;
 
+
 class FuncionarioController extends Controller
 {
     public function index(Request $request)
     {
         $query = Funcionario::with('emprestimoAtivo.equipamento');
 
-        if ($request->busca) $query->where(function($q) use ($request) {
-            $q->where('nome', 'like', "%{$request->busca}%")
-              ->orWhere('cpf', 'like', "%{$request->busca}%");
+        if ($request->search) $query->where(function($q) use ($request) {
+            $q->where('nome', 'like', "%{$request->search}%")
+              ->orWhere('cpf', 'like', "%{$request->search}%");
         });
 
         if ($request->setor) $query->where('setor', 'like', "%{$request->setor}%");
@@ -21,7 +22,8 @@ class FuncionarioController extends Controller
 
         $funcionarios = $query->orderBy('nome')->get();
 
-        return \Inertia\Inertia::render('Funcionarios/Index', ['funcionarios' => $funcionarios]);
+        return \Inertia\Inertia::render('Funcionarios/Index', 
+        ['funcionarios' => $funcionarios]);
     }
 
     public function create()

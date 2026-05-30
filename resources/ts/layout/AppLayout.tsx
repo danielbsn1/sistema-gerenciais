@@ -1,19 +1,18 @@
-import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+import "../styles/layout.css";
 
 type Props = {
-    children: React.ReactNode;
     title?: string;
+    children: React.ReactNode;
 };
 
-export default function AppLayout({ children }: Props) {
+export default function AppLayout({ title, children }: Props) {
     return (
         <div className="layout">
             <Sidebar />
 
             <div className="main-content">
-                <Navbar />
-
                 <main className="page-content">{children}</main>
             </div>
         </div>

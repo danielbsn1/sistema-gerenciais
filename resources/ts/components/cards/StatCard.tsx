@@ -1,14 +1,19 @@
-type Props = {
+import { ReactNode } from "react";
+
+type StatCardProps = {
     title: string;
-    value: number;
+    value: number | string;
+    icon: ReactNode;
 };
 
-export default function StatCard({ title, value }: Props) {
+export default function StatCard({ title, value, icon }: StatCardProps) {
     return (
         <div className="stat-card">
-            <h3>{title}</h3>
-
-            <p>{value}</p>
+            <div className="stat-card-icon">{icon}</div>
+            <div className="stat-card-info">
+                <h3>{title}</h3>
+                <p>{value}</p>
+            </div>
         </div>
     );
 }

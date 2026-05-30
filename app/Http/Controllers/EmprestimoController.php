@@ -19,7 +19,8 @@ class EmprestimoController extends Controller
                                          $q->where('nome', 'like', "%{$request->funcionario}%"));
 
         $emprestimos = $query->latest()->get();
-        return \Inertia\Inertia::render('Emprestimos/Index', ['emprestimos' => $emprestimos]);
+        return \Inertia\Inertia::render('Emprestimos/Index',
+         ['emprestimos' => $emprestimos]);
     }
 
     public function create()

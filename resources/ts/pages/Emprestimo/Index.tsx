@@ -11,7 +11,7 @@ interface Props {
     filters: { search?: string; status?: string };
 }
 
-const EmprestimosIndex: FC<Props> = ({ emprestimos, filters }) => {
+const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
     const [status, setStatus] = useState(filters.status ?? "");
 
@@ -32,7 +32,7 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos, filters }) => {
     };
 
     return (
-        <AppLayout title="Empréstimos">
+        <AppLayout>
             {/* Filters */}
             <div className="filters-card">
                 <div className="filter-group">

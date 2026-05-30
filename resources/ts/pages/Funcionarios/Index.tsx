@@ -11,7 +11,7 @@ interface Props {
     filters: { search?: string; setor?: string; tipo?: string };
 }
 
-const FuncionariosIndex: FC<Props> = ({ funcionarios, filters }) => {
+const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
     const [setor, setSetor] = useState(filters.setor ?? "");
     const [tipo, setTipo] = useState(filters.tipo ?? "");

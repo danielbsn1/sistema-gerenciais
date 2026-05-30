@@ -13,15 +13,23 @@ class EquipamentoController extends Controller
 
         if ($request->tipo)   $query->where('tipo', $request->tipo);
         if ($request->status) $query->where('status', $request->status);
-        if ($request->busca)  $query->where(function($q) use ($request) {
-            $q->where('patrimonio_id', 'like', "%{$request->busca}%")
-              ->orWhere('marca', 'like', "%{$request->busca}%")
-              ->orWhere('modelo', 'like', "%{$request->busca}%");
+        if ($request->search)  $query->where(function($q) use ($request) {
+            $q->where('patrimonio_id', 'like', "%{$request->search}%")
+              ->orWhere('marca', 'like', "%{$request->search}%")
+              ->orWhere('modelo', 'like', "%{$request->search}%");
         });
 
         $equipamentos = $query->orderBy('tipo')->get();
 
-        return \Inertia\Inertia::render('Equipamentos/Index', ['equipamentos' => $equipamentos]);
+       return \Inertia\Inertia::render('Equipamentos/Index', [
+        'equipamentos' => $equipamentos,
+
+        'filters' => [
+        'search' => $request->search,
+        'tipo' => $request->tipo,
+        'status' => $request->status,
+    ],
+]);
     }
 
     public function create()

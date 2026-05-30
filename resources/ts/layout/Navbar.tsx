@@ -1,36 +1,27 @@
 import { usePage, Link } from "@inertiajs/react";
-import type { PageProps } from "../types/PageProps";
+import "../styles/navbar.css";
 
 export default function Navbar() {
-    const { auth } = usePage<PageProps>().props;
+    const page = usePage();
+
+    console.log(page.props);
 
     return (
         <header className="navbar">
-            <h1>Painel Administrativo</h1>
+            <h1>Dashboard</h1>
 
-            <div>{auth.user.name}</div>
-            <Link href="/login" method="get" as="button">
-                login
-            </Link>
+            <div className="navbar-right">
+                <span>Usuário</span>
 
-            <Link href="/dashboard" method="get" as="button">
-                dashboard
-            </Link>
-
-            <Link href="/equipamentos" method="get" as="button">
-                equipamentos
-            </Link>
-            <Link href="/funcionarios" method="get" as="button">
-                funcionarios
-            </Link>
-
-            <Link href="/emprestimos" method="get" as="button">
-                emprestimos
-            </Link>
-
-            <Link href="/logout" method="post" as="button">
-                sair
-            </Link>
+                <Link
+                    href="/logout"
+                    method="post"
+                    as="button"
+                    className="logout-button"
+                >
+                    Sair
+                </Link>
+            </div>
         </header>
     );
 }

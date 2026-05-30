@@ -3,7 +3,9 @@ import { router } from "@inertiajs/react";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
+import "../../components/table/EquipamentoTable";
 import { Equipamento } from "../../types/funcionarios";
+import "../../styles/equipamentos.css";
 
 interface Props {
     equipamentos: Equipamento[];
@@ -21,7 +23,7 @@ const TIPOS = [
 ];
 const STATUS = ["disponivel", "em_uso", "manutencao"];
 
-const EquipamentosIndex: FC<Props> = ({ equipamentos, filters }) => {
+const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
     const [tipo, setTipo] = useState(filters.tipo ?? "");
     const [status, setStatus] = useState(filters.status ?? "");
