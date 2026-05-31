@@ -1,61 +1,112 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
+use Inertia\Inertia;
+
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\EquipamentoController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\EmprestimoController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
-    
-  
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/dashboard', function () {
-         return Inertia::render('Dashboard/Index');
-           })->middleware(['auth'])->name('dashboard');
+        return Inertia::render('Dashboard/Index');
+    })->name('dashboard');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Equipamentos
+    |--------------------------------------------------------------------------
+    */
 
+    Route::get('/equipamentos', [EquipamentoController::class, 'index'])
+        ->name('equipamentos.index');
 
+    Route::get('/equipamentos/create', [EquipamentoController::class, 'create'])
+        ->name('equipamentos.create');
 
-    Route::get('equipamentos',function(){
-        return Inertia::render('Equipamentos/Index');
-    })->name('equipamentos.index');
-    Route::get('equipamentos/create',function(){
-        return Inertia::render('Equipamentos/Create');
-    })->name('equipamentos.create');
-    
-    Route::get('funcionarios', function () {
-        return Inertia::render('Funcionarios/Index');
-    })->name('funcionarios.index');
-    Route::get('funcionarios/,create', function () {
-        return Inertia::render('Funcionarios/Create');
-    })->name('funcionarios.create');
+    Route::post('/equipamentos', [EquipamentoController::class, 'store'])
+        ->name('equipamentos.store');
 
-    Route::get('emprestimos', function () {
-    return Inertia::render('Emprestimos/Index', [
-        'emprestimos' => [],
-        'filters' => [
-            'search' => '',
-            'status' => '',
-        ],
-    ]);
-})->name('emprestimos.index');
+    Route::get('/equipamentos/{equipamento}', [EquipamentoController::class, 'show'])
+        ->name('equipamentos.show');
 
+    Route::get('/equipamentos/{equipamento}/edit', [EquipamentoController::class, 'edit'])
+        ->name('equipamentos.edit');
 
+    Route::put('/equipamentos/{equipamento}', [EquipamentoController::class, 'update'])
+        ->name('equipamentos.update');
 
-    Route::get('emprestimos/create',function(){
-        return Inertia::render('Emprestimos/Create');
-    })->name('emprestimos.create');
-   Route::get('emprestimos/{emprestimo}', function ($emprestimo) {
-        return Inertia::render('Emprestimos/Show', ['emprestimoId' => $emprestimo]);
-    })->name('emprestimos.show');
-    Route::patch('emprestimos/{emprestimo}/devolver', function ($emprestimo) {
-        return Inertia::render('Emprestimos/Devolver', ['emprestimoId' => $emprestimo]);
-    })->name('emprestimos.devolver');
-        
+    Route::delete('/equipamentos/{equipamento}', [EquipamentoController::class, 'destroy'])
+        ->name('equipamentos.destroy');
+
+   
+    /*
+    |--------------------------------------------------------------------------
+    | Funcionários
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/funcionarios', [FuncionarioController::class, 'index'])
+        ->name('funcionarios.index');
+
+    Route::get('/funcionarios/create', [FuncionarioController::class, 'create'])
+        ->name('funcionarios.create');
+
+    Route::post('/funcionarios', [FuncionarioController::class, 'store'])
+        ->name('funcionarios.store');
+
+    Route::get('/funcionarios/{funcionario}', [FuncionarioController::class, 'show'])
+        ->name('funcionarios.show');
+
+    Route::get('/funcionarios/{funcionario}/edit', [FuncionarioController::class, 'edit'])
+        ->name('funcionarios.edit');
+
+    Route::put('/funcionarios/{funcionario}', [FuncionarioController::class, 'update'])
+        ->name('funcionarios.update');
+
+    Route::delete('/funcionarios/{funcionario}', [FuncionarioController::class, 'destroy'])
+        ->name('funcionarios.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Empréstimos
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/emprestimos', [EmprestimoController::class, 'index'])
+        ->name('emprestimos.index');
+
+    Route::get('/emprestimos/create', [EmprestimoController::class, 'create'])
+        ->name('emprestimos.create');
+
+    Route::post('/emprestimos', [EmprestimoController::class, 'store'])
+        ->name('emprestimos.store');
+
+    Route::get('/emprestimos/{emprestimo}', [EmprestimoController::class, 'show'])
+        ->name('emprestimos.show');
+
+    Route::get('/emprestimos/{emprestimo}/edit', [EmprestimoController::class, 'edit'])
+        ->name('emprestimos.edit');
+
+    Route::put('/emprestimos/{emprestimo}', [EmprestimoController::class, 'update'])
+        ->name('emprestimos.update');
+
+    Route::delete('/emprestimos/{emprestimo}', [EmprestimoController::class, 'destroy'])
+        ->name('emprestimos.destroy');
+
+    Route::patch('/emprestimos/{emprestimo}/devolver', [EmprestimoController::class, 'devolver'])
+        ->name('emprestimos.devolver'); 
+
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->name('logout');
+        ->name('logout');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

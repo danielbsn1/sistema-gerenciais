@@ -1,13 +1,28 @@
 import AppLayout from "../../layout/AppLayout";
 import StatCard from "../../components/cards/StatCard";
+
 import { FaUsers } from "react-icons/fa";
 import { FaBox } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
-import { FaBeer, FaCheckCircle } from "react-icons/fa"; // Importa da biblioteca FontAwesome
-import { MdOutlineAlarm } from "react-icons/md"; // Importa da biblioteca Material Design
-import EquipamentosEmUso from "../../components/dashboard/EquipamentosEmUso";
+import { FaCheckCircle } from "react-icons/fa";
+
 import "../../styles/dashboard.css";
-export default function Dashboard() {
+
+interface Props {
+    totalEquipamentos: number;
+    equipamentosDisponiveis: number;
+    equipamentosEmUso: number;
+    equipamentosManutencao: number;
+    totalFuncionarios: number;
+}
+
+export default function Dashboard({
+    totalEquipamentos,
+    equipamentosDisponiveis,
+    equipamentosEmUso,
+    equipamentosManutencao,
+    totalFuncionarios,
+}: Props) {
     return (
         <AppLayout>
             <div className="dashboard-header">
@@ -16,15 +31,35 @@ export default function Dashboard() {
             </div>
 
             <div className="stats-grid">
-                <StatCard title="Total" value={120} icon={<FaBox />} />
+                <StatCard
+                    title="Total"
+                    value={totalEquipamentos}
+                    icon={<FaBox />}
+                />
+
                 <StatCard
                     title="Disponíveis"
-                    value={80}
+                    value={equipamentosDisponiveis}
                     icon={<FaCheckCircle />}
                 />
-                <StatCard title="Em Uso" value={30} icon={<FaUsers />} />
-                <StatCard title="Manutenção" value={10} icon={<FaTools />} />
-                <StatCard title="Funcionários" value={25} icon={<FaUsers />} />
+
+                <StatCard
+                    title="Em Uso"
+                    value={equipamentosEmUso}
+                    icon={<FaUsers />}
+                />
+
+                <StatCard
+                    title="Manutenção"
+                    value={equipamentosManutencao}
+                    icon={<FaTools />}
+                />
+
+                <StatCard
+                    title="Funcionários"
+                    value={totalFuncionarios}
+                    icon={<FaUsers />}
+                />
             </div>
         </AppLayout>
     );

@@ -1,4 +1,3 @@
-// resources/ts/pages/Equipamentos/Show.tsx
 import { FC } from "react";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";

@@ -75,10 +75,14 @@ class EquipamentoController extends Controller
 
         return redirect()->route('equipamentos.show', $equipamento)->with('success', 'Atualizado!');
     }
+   public function destroy(Equipamento $equipamento)
+{
+    $equipamento->emprestimos()->delete();
 
-    public function destroy(Equipamento $equipamento)
-    {
-        $equipamento->delete();
-        return redirect()->route('equipamentos.index')->with('success', 'Removido!');
-    }
+    $equipamento->delete();
+
+    return redirect()
+        ->route('equipamentos.index')
+        ->with('success', 'Equipamento removido!');
+}
 }

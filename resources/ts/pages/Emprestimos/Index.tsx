@@ -27,7 +27,7 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
 
     const handleDevolver = (id: number) => {
         if (confirm("Confirmar devolução deste equipamento?")) {
-            router.post(`/emprestimos/${id}/devolver`);
+            router.patch(`/emprestimos/${id}/devolver`);
         }
     };
 

@@ -44,9 +44,19 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm("Deseja excluir este equipamento?")) {
-            router.delete(`/equipamentos/${id}`);
+        if (!confirm("Deseja excluir este equipamento?")) {
+            return;
         }
+
+        router.delete(`/equipamentos/${id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                console.log("Equipamento excluído");
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
+        });
     };
 
     return (
@@ -180,15 +190,15 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                                                 >
                                                     Editar
                                                 </Button>
-                                                <Button
-                                                    variant="link-danger"
-                                                    size="sm"
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger"
                                                     onClick={() =>
                                                         handleDelete(eq.id)
                                                     }
                                                 >
                                                     Excluir
-                                                </Button>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
