@@ -5,6 +5,8 @@ import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Funcionario } from "../../types/funcionarios";
+import "../../styles/equipamentos.css";
+import "../../styles/showeq.css";
 
 interface Props {
     funcionarios: Funcionario[];

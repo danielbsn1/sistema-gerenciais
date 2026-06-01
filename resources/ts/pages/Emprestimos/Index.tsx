@@ -5,6 +5,9 @@ import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Emprestimo } from "../../types/funcionarios";
+import "../../styles/form.css";
+import "../../styles/equipamentos.css";
+import "../../styles/showeq.css";
 
 interface Props {
     emprestimos: Emprestimo[];

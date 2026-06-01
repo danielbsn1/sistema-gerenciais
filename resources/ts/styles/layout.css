@@ -3,11 +3,33 @@
     min-height: 100vh;
 }
 
+.sidebar {
+    width: 260px;
+    background: #001f5c;
+    color: white;
+    padding: 24px;
+}
+
+.sidebar h2 {
+    margin-bottom: 40px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar a {
+    color: white;
+    font-size: 18px;
+}
+
 .main-content {
     flex: 1;
-    background: #f3f4f6;
+    padding: 30px;
 }
 
 .page-content {
-    padding: 30px;
+    width: 100%;
 }

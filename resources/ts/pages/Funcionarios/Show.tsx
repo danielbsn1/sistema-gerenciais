@@ -1,56 +1,46 @@
 // resources/ts/pages/Funcionarios/Show.tsx
+// resources/ts/pages/Funcionarios/Show.tsx
 import { FC } from "react";
+import { router } from "@inertiajs/react";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
 import { Funcionario, Emprestimo } from "../../types/funcionarios";
+import "../../styles/showeq.css";
+import "../../styles/equipamentos.css";
 
 interface Props {
-    funcionario: Funcionario;
+    funcionario: Funcionario & { ativo: boolean };
     historico: Emprestimo[];
 }
 
 const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
     return (
         <AppLayout title="Funcionários">
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 20,
-                }}
-            >
-                <div>
-                    <h2
-                        style={{
-                            fontSize: 20,
-                            fontWeight: 700,
-                            letterSpacing: "-0.03em",
-                        }}
-                    >
-                        {funcionario.nome}
-                    </h2>
-                    <p
-                        style={{
-                            fontSize: 12,
-                            color: "var(--text-muted)",
-                            marginTop: 2,
-                            fontFamily: "monospace",
-                        }}
-                    >
-                        {funcionario.cpf}
-                    </p>
+            <div className="page-header">
+                <div className="page-header__info">
+                    <h2>{funcionario.nome}</h2>
+                    <p>{funcionario.cpf}</p>
                 </div>
-                <div style={{ display: "flex", gap: 10 }}>
-                    <Button>
-                        as="link" href="/funcionarios" variant="secondary"
-                        size="sm" ← Voltar
+                <div className="page-header__actions">
+                    <Button as="link" href="/funcionarios" variant="secondary" size="sm">
+                        ← Voltar
                     </Button>
-                    <Button>
-                        as="link" href={`/funcionarios/${funcionario.id}/edit`}
-                        variant="primary" size="sm" Editar
+                    <Button
+                        variant={funcionario.ativo ? "danger" : "primary"}
+                        size="sm"
+                        onClick={() => {
+                            const acao = funcionario.ativo ? "inativar" : "ativar";
+                            if (confirm(`Deseja ${acao} este funcionário?`)) {
+                                router.patch(`/funcionarios/${funcionario.id}/inativar`);
+                            }
+                        }}
+                    >
+                        {funcionario.ativo ? "Inativar" : "Ativar"}
+                    </Button>
+                    <Button as="link" href={`/funcionarios/${funcionario.id}/edit`} variant="primary" size="sm">
+                        Editar
                     </Button>
                 </div>
             </div>

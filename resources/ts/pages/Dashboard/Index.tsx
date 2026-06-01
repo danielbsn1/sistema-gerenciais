@@ -1,27 +1,22 @@
 import AppLayout from "../../layout/AppLayout";
 import StatCard from "../../components/cards/StatCard";
-
-import { FaUsers } from "react-icons/fa";
-import { FaBox } from "react-icons/fa";
-import { FaTools } from "react-icons/fa";
-import { FaCheckCircle } from "react-icons/fa";
-
+import { FaUsers, FaBox, FaTools, FaCheckCircle } from "react-icons/fa";
 import "../../styles/dashboard.css";
 
 interface Props {
     totalEquipamentos: number;
-    equipamentosDisponiveis: number;
-    equipamentosEmUso: number;
-    equipamentosManutencao: number;
-    totalFuncionarios: number;
+    disponiveis: number;
+    emUso: number;
+    manutencao: number;
+    funcionarios: number;
 }
 
 export default function Dashboard({
     totalEquipamentos,
-    equipamentosDisponiveis,
-    equipamentosEmUso,
-    equipamentosManutencao,
-    totalFuncionarios,
+    disponiveis,
+    emUso,
+    manutencao,
+    funcionarios,
 }: Props) {
     return (
         <AppLayout>
@@ -39,25 +34,21 @@ export default function Dashboard({
 
                 <StatCard
                     title="Disponíveis"
-                    value={equipamentosDisponiveis}
+                    value={disponiveis}
                     icon={<FaCheckCircle />}
                 />
 
-                <StatCard
-                    title="Em Uso"
-                    value={equipamentosEmUso}
-                    icon={<FaUsers />}
-                />
+                <StatCard title="Em Uso" value={emUso} icon={<FaUsers />} />
 
                 <StatCard
                     title="Manutenção"
-                    value={equipamentosManutencao}
+                    value={manutencao}
                     icon={<FaTools />}
                 />
 
                 <StatCard
                     title="Funcionários"
-                    value={totalFuncionarios}
+                    value={funcionarios}
                     icon={<FaUsers />}
                 />
             </div>

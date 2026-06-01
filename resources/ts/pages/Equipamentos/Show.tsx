@@ -4,6 +4,8 @@ import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
 import { Equipamento, Emprestimo } from "../../types/funcionarios";
+import "../../styles/showeq.css";
+import "../../styles/equipamentos.css";
 
 interface Props {
     equipamento: Equipamento;
@@ -14,36 +16,14 @@ const EquipamentosShow: FC<Props> = ({ equipamento, historico }) => {
     return (
         <AppLayout title="Equipamentos">
             {/* Header */}
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 20,
-                }}
-            >
-                <div>
-                    <h2
-                        style={{
-                            fontSize: 20,
-                            fontWeight: 700,
-                            letterSpacing: "-0.03em",
-                        }}
-                    >
+            <div className="page-header">
+                <div className="page-header__info">
+                    <h2>
                         {equipamento.marca} {equipamento.modelo}
                     </h2>
-                    <p
-                        style={{
-                            fontSize: 12,
-                            color: "var(--text-muted)",
-                            marginTop: 2,
-                            fontFamily: "monospace",
-                        }}
-                    >
-                        #{equipamento.id_patrimonio}
-                    </p>
+                    <p>#{equipamento.id_patrimonio}</p>
                 </div>
-                <div style={{ display: "flex", gap: 10 }}>
+                <div className="page-header__actions">
                     <Button
                         as="link"
                         href="/equipamentos"

@@ -1,5 +1,8 @@
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
+import './styles/globals.css'
+import './components/Index.css'
+import './styles/button.css'
 
 createInertiaApp({
     resolve: name => {

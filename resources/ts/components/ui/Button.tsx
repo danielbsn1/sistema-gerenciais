@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "react";
 import { Link } from "@inertiajs/react";
+import "../../styles/button.css";
 
 type Variant =
     | "primary"

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\EquipamentoController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\EmprestimoController;
+use App\Http\Controllers\DashboardController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -16,9 +17,8 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard/Index');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -71,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/funcionarios/{funcionario}', [FuncionarioController::class, 'update'])
         ->name('funcionarios.update');
+
+    Route::patch('/funcionarios/{funcionario}/inativar', [FuncionarioController::class, 'inativar'])
+        ->name('funcionarios.inativar');
 
     Route::delete('/funcionarios/{funcionario}', [FuncionarioController::class, 'destroy'])
         ->name('funcionarios.destroy');

@@ -1,6 +1,8 @@
 import { useForm } from "@inertiajs/react";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
+import "../../styles/form.css";
+import "../../styles/equipamentos.css";
 
 export default function EquipamentosCreate() {
     const { data, setData, post, processing, errors } = useForm({
@@ -18,84 +20,100 @@ export default function EquipamentosCreate() {
 
     return (
         <AppLayout title="Novo Equipamento">
-            <div className="card">
-                <div className="card__header">
-                    <h2>Cadastrar Equipamento</h2>
+            <div className="page-form">
+                <div className="form-card">
+                    <div className="form-card__header">
+                        <h2 className="form-card__title">Cadastrar Equipamento</h2>
+                        <p className="form-card__subtitle">Preencha os dados do novo ativo</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} id="create-eq-form">
+                        <div className="form-card__body">
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label className="form-label form-label--required">
+                                        ID Patrimônio
+                                    </label>
+                                    <input
+                                        className={`form-input ${errors.patrimonio_id ? "is-error" : ""}`}
+                                        type="text"
+                                        placeholder="Ex: PAT-0001"
+                                        value={data.patrimonio_id}
+                                        onChange={(e) => setData("patrimonio_id", e.target.value)}
+                                    />
+                                    {errors.patrimonio_id && (
+                                        <span className="form-error">{errors.patrimonio_id}</span>
+                                    )}
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label form-label--required">Tipo</label>
+                                    <select
+                                        className={`form-select ${errors.tipo ? "is-error" : ""}`}
+                                        value={data.tipo}
+                                        onChange={(e) => setData("tipo", e.target.value)}
+                                    >
+                                        <option value="">Selecione...</option>
+                                        <option value="notebook">Notebook</option>
+                                        <option value="desktop">Desktop</option>
+                                        <option value="monitor">Monitor</option>
+                                        <option value="tablet">Tablet</option>
+                                    </select>
+                                    {errors.tipo && (
+                                        <span className="form-error">{errors.tipo}</span>
+                                    )}
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label form-label--required">Marca</label>
+                                    <input
+                                        className={`form-input ${errors.marca ? "is-error" : ""}`}
+                                        type="text"
+                                        placeholder="Ex: Dell, Lenovo..."
+                                        value={data.marca}
+                                        onChange={(e) => setData("marca", e.target.value)}
+                                    />
+                                    {errors.marca && (
+                                        <span className="form-error">{errors.marca}</span>
+                                    )}
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label form-label--required">Modelo</label>
+                                    <input
+                                        className={`form-input ${errors.modelo ? "is-error" : ""}`}
+                                        type="text"
+                                        placeholder="Ex: Inspiron 15"
+                                        value={data.modelo}
+                                        onChange={(e) => setData("modelo", e.target.value)}
+                                    />
+                                    {errors.modelo && (
+                                        <span className="form-error">{errors.modelo}</span>
+                                    )}
+                                </div>
+
+                                <div className="form-group form-group--full">
+                                    <label className="form-label">Observações</label>
+                                    <textarea
+                                        className="form-textarea"
+                                        placeholder="Informações adicionais..."
+                                        value={data.observacoes}
+                                        onChange={(e) => setData("observacoes", e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="form-card__footer">
+                            <Button as="link" href="/equipamentos" variant="secondary">
+                                Cancelar
+                            </Button>
+                            <Button type="submit" variant="primary" disabled={processing}>
+                                {processing ? "Salvando..." : "Cadastrar"}
+                            </Button>
+                        </div>
+                    </form>
                 </div>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>ID Patrimônio</label>
-                        <input
-                            type="text"
-                            value={data.patrimonio_id}
-                            onChange={(e) =>
-                                setData("patrimonio_id", e.target.value)
-                            }
-                        />
-                        {errors.patrimonio_id && (
-                            <div className="error">{errors.patrimonio_id}</div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>Tipo</label>
-                        <select
-                            value={data.tipo}
-                            onChange={(e) => setData("tipo", e.target.value)}
-                        >
-                            <option value="">Selecione</option>
-                            <option value="notebook">Notebook</option>
-                            <option value="desktop">Desktop</option>
-                            <option value="monitor">Monitor</option>
-                            <option value="tablet">Tablet</option>
-                        </select>
-
-                        {errors.tipo && (
-                            <div className="error">{errors.tipo}</div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>Marca</label>
-                        <input
-                            type="text"
-                            value={data.marca}
-                            onChange={(e) => setData("marca", e.target.value)}
-                        />
-
-                        {errors.marca && (
-                            <div className="error">{errors.marca}</div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>Modelo</label>
-                        <input
-                            type="text"
-                            value={data.modelo}
-                            onChange={(e) => setData("modelo", e.target.value)}
-                        />
-
-                        {errors.modelo && (
-                            <div className="error">{errors.modelo}</div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>Observações</label>
-                        <textarea
-                            value={data.observacoes}
-                            onChange={(e) =>
-                                setData("observacoes", e.target.value)
-                            }
-                        />
-                    </div>
-
-                    <Button type="submit" disabled={processing}>
-                        {processing ? "Salvando..." : "Cadastrar"}
-                    </Button>
-                </form>
             </div>
         </AppLayout>
     );

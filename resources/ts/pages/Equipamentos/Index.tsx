@@ -190,15 +190,13 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                                                 >
                                                     Editar
                                                 </Button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger"
-                                                    onClick={() =>
-                                                        handleDelete(eq.id)
-                                                    }
+                                                <Button
+                                                    variant="link-danger"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(eq.id)}
                                                 >
                                                     Excluir
-                                                </button>
+                                                </Button>
                                             </div>
                                         </td>
                                     </tr>
