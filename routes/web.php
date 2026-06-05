@@ -11,11 +11,11 @@ use App\Http\Controllers\DashboardController;
 
 Route::middleware(['auth'])->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard
-    |--------------------------------------------------------------------------
-    */
+    Route::get('/', function () {
+        return redirect()->route('dashboard');
+    });
+
+    
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');

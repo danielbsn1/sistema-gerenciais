@@ -5,11 +5,13 @@ import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Input";
 import { Funcionario } from "../../types/funcionarios";
+
+type FuncionarioComAtivo = Funcionario & { ativo: boolean };
 import "../../styles/equipamentos.css";
 import "../../styles/showeq.css";
 
 interface Props {
-    funcionarios: Funcionario[];
+    funcionarios: FuncionarioComAtivo[];
     filters: { search?: string; setor?: string; tipo?: string };
 }
 
@@ -118,18 +120,11 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
                                 funcionarios.map((f) => (
                                     <tr key={f.id}>
                                         <td>{f.nome}</td>
-                                        <td
-                                            style={{
-                                                fontFamily: "monospace",
-                                                fontSize: 13,
-                                            }}
-                                        >
+                                        <td style={{ fontFamily: "monospace", fontSize: 13 }}>
                                             {f.cpf}
                                         </td>
                                         <td>
-                                            <span className="chip">
-                                                {f.setor}
-                                            </span>
+                                            <span className="chip">{f.setor}</span>
                                         </td>
                                         <td>
                                             <Badge variant={f.tipo} />
@@ -148,10 +143,22 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
                                                 <Button
                                                     as="link"
                                                     href={`/funcionarios/${f.id}/edit`}
-                                                    variant="link-warning"
+                                                    variant="link"
                                                     size="sm"
                                                 >
                                                     Editar
+                                                </Button>
+                                                <Button
+                                                    variant={f.ativo ? "link-danger" : "link"}
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        const acao = f.ativo ? "inativar" : "ativar";
+                                                        if (confirm(`Deseja ${acao} ${f.nome}?`)) {
+                                                            router.patch(`/funcionarios/${f.id}/inativar`, {}, { preserveScroll: true });
+                                                        }
+                                                    }}
+                                                >
+                                                    {f.ativo ? "Inativar" : "Ativar"}
                                                 </Button>
                                             </div>
                                         </td>
