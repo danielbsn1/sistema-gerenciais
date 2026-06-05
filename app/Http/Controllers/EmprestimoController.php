@@ -6,6 +6,8 @@ use App\Models\Emprestimo;
 use App\Models\Equipamento;
 use App\Models\Funcionario;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class EmprestimoController extends Controller
 {
@@ -19,15 +21,20 @@ class EmprestimoController extends Controller
                                          $q->where('nome', 'like', "%{$request->funcionario}%"));
 
         $emprestimos = $query->latest()->get();
-        return view('emprestimos.index', compact('emprestimos'));
+        return \Inertia\Inertia::render('Emprestimos/Index',
+         ['emprestimos' => $emprestimos]);
     }
 
     public function create()
-    {
-        $equipamentos = Equipamento::where('status', 'disponivel')->get();
-        $funcionarios = Funcionario::where('ativo', true)->orderBy('nome')->get();
-        return view('emprestimos.create', compact('equipamentos', 'funcionarios'));
-    }
+{
+    $equipamentos = Equipamento::where('status', 'disponivel')->get();
+    $funcionarios = Funcionario::all();
+
+    return Inertia::render('Emprestimos/Create', [
+        'equipamentos' => $equipamentos,
+        'funcionarios' => $funcionarios,
+    ]);
+}
 
     public function store(Request $request)
     {
@@ -42,14 +49,14 @@ class EmprestimoController extends Controller
             return back()->withErrors(['equipamento_id' => 'Equipamento não disponível.']);
         }
 
-        Emprestimo::create([
-            'equipamento_id' => $request->equipamento_id,
-            'funcionario_id' => $request->funcionario_id,
-            'admin_id'       => auth()->id(),
-            'data_saida'     => now(),
-            'status'         => 'ativo',
-            'observacoes'    => $request->observacoes,
-        ]);
+       Emprestimo::create([
+    'equipamento_id' => $request->equipamento_id,
+    'funcionario_id' => $request->funcionario_id,
+     'admin_id' => 1,
+    'data_saida'     => now(),
+    'status'         => 'ativo',
+    'observacoes'    => $request->observacoes,
+]);
 
         $equipamento->update(['status' => 'em_uso']);
 
@@ -67,4 +74,34 @@ class EmprestimoController extends Controller
 
         return back()->with('success', 'Devolução registrada!');
     }
+
+     public function show(Emprestimo $emprestimo)
+{
+    $emprestimo->load([
+        'equipamento',
+        'funcionario',
+    ]);
+
+    return Inertia::render('Emprestimos/Show', [
+        'emprestimo' => $emprestimo,
+    ]);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

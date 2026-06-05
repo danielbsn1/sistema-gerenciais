@@ -5,25 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Equipamento;
 use App\Models\Funcionario;
 use App\Models\Emprestimo;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $stats = [
-            'total'        => Equipamento::count(),
-            'disponiveis'  => Equipamento::where('status', 'disponivel')->count(),
-            'em_uso'       => Equipamento::where('status', 'em_uso')->count(),
-            'manutencao'   => Equipamento::where('status', 'manutencao')->count(),
-            'funcionarios' => Funcionario::where('ativo', true)->count(),
-        ];
+        return Inertia::render('Dashboard/Index', [
+            'totalEquipamentos' => Equipamento::count(),
 
-        $emprestimos_recentes = Emprestimo::with(['equipamento', 'funcionario'])
-                                          ->where('status', 'ativo')
-                                          ->latest()
-                                          ->take(10)
-                                          ->get();
+            'disponiveis' => Equipamento::where(
+                'status',
+                'disponivel'
+            )->count(),
 
-        return view('dashboard.index', compact('stats', 'emprestimos_recentes'));
+            'emUso' => Equipamento::where(
+                'status',
+                'em_uso'
+            )->count(),
+
+            'manutencao' => Equipamento::where(
+                'status',
+                'manutencao'
+            )->count(),
+
+            'funcionarios' => Funcionario::count(),
+        ]);
     }
 }

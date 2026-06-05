@@ -5,15 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Funcionario;
 use Illuminate\Http\Request;
 
+
 class FuncionarioController extends Controller
 {
     public function index(Request $request)
     {
         $query = Funcionario::with('emprestimoAtivo.equipamento');
 
-        if ($request->busca) $query->where(function($q) use ($request) {
-            $q->where('nome', 'like', "%{$request->busca}%")
-              ->orWhere('cpf', 'like', "%{$request->busca}%");
+        if ($request->search) $query->where(function($q) use ($request) {
+            $q->where('nome', 'like', "%{$request->search}%")
+              ->orWhere('cpf', 'like', "%{$request->search}%");
         });
 
         if ($request->setor) $query->where('setor', 'like', "%{$request->setor}%");
@@ -21,12 +22,13 @@ class FuncionarioController extends Controller
 
         $funcionarios = $query->orderBy('nome')->get();
 
-        return view('funcionarios.index', compact('funcionarios'));
+        return \Inertia\Inertia::render('Funcionarios/Index', 
+        ['funcionarios' => $funcionarios]);
     }
 
     public function create()
     {
-        return view('funcionarios.create');
+        return \Inertia\Inertia::render('Funcionarios/Create');
     }
 
     public function store(Request $request)
@@ -45,12 +47,12 @@ class FuncionarioController extends Controller
     public function show(Funcionario $funcionario)
     {
         $historico = $funcionario->emprestimos()->with('equipamento')->latest()->get();
-        return view('funcionarios.show', compact('funcionario', 'historico'));
+        return \Inertia\Inertia::render('Funcionarios/Show', ['funcionario' => $funcionario, 'historico' => $historico]);
     }
 
     public function edit(Funcionario $funcionario)
     {
-        return view('funcionarios.edit', compact('funcionario'));
+        return \Inertia\Inertia::render('Funcionarios/Edit', ['funcionario' => $funcionario]);
     }
 
     public function update(Request $request, Funcionario $funcionario)
@@ -64,6 +66,13 @@ class FuncionarioController extends Controller
         $funcionario->update($request->all());
 
         return redirect()->route('funcionarios.show', $funcionario)->with('success', 'Atualizado!');
+    }
+
+    public function inativar(Funcionario $funcionario)
+    {
+        $funcionario->update(['ativo' => !$funcionario->ativo]);
+        $status = $funcionario->ativo ? 'ativado' : 'inativado';
+        return back()->with('success', "Funcionário {$status}!");
     }
 
     public function destroy(Funcionario $funcionario)

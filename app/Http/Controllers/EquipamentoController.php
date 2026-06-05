@@ -13,20 +13,28 @@ class EquipamentoController extends Controller
 
         if ($request->tipo)   $query->where('tipo', $request->tipo);
         if ($request->status) $query->where('status', $request->status);
-        if ($request->busca)  $query->where(function($q) use ($request) {
-            $q->where('patrimonio_id', 'like', "%{$request->busca}%")
-              ->orWhere('marca', 'like', "%{$request->busca}%")
-              ->orWhere('modelo', 'like', "%{$request->busca}%");
+        if ($request->search)  $query->where(function($q) use ($request) {
+            $q->where('patrimonio_id', 'like', "%{$request->search}%")
+              ->orWhere('marca', 'like', "%{$request->search}%")
+              ->orWhere('modelo', 'like', "%{$request->search}%");
         });
 
         $equipamentos = $query->orderBy('tipo')->get();
 
-        return view('equipamentos.index', compact('equipamentos'));
+       return \Inertia\Inertia::render('Equipamentos/Index', [
+        'equipamentos' => $equipamentos,
+
+        'filters' => [
+        'search' => $request->search,
+        'tipo' => $request->tipo,
+        'status' => $request->status,
+    ],
+]);
     }
 
     public function create()
     {
-        return view('equipamentos.create');
+        return \Inertia\Inertia::render('Equipamentos/Create');
     }
 
     public function store(Request $request)
@@ -46,12 +54,12 @@ class EquipamentoController extends Controller
     public function show(Equipamento $equipamento)
     {
         $historico = $equipamento->emprestimos()->with('funcionario')->latest()->get();
-        return view('equipamentos.show', compact('equipamento', 'historico'));
+        return \Inertia\Inertia::render('Equipamentos/Show', ['equipamento' => $equipamento, 'historico' => $historico]);
     }
 
     public function edit(Equipamento $equipamento)
     {
-        return view('equipamentos.edit', compact('equipamento'));
+        return \Inertia\Inertia::render('Equipamentos/Edit', ['equipamento' => $equipamento]);
     }
 
     public function update(Request $request, Equipamento $equipamento)
@@ -67,10 +75,14 @@ class EquipamentoController extends Controller
 
         return redirect()->route('equipamentos.show', $equipamento)->with('success', 'Atualizado!');
     }
+   public function destroy(Equipamento $equipamento)
+{
+    $equipamento->emprestimos()->delete();
 
-    public function destroy(Equipamento $equipamento)
-    {
-        $equipamento->delete();
-        return redirect()->route('equipamentos.index')->with('success', 'Removido!');
-    }
+    $equipamento->delete();
+
+    return redirect()
+        ->route('equipamentos.index')
+        ->with('success', 'Equipamento removido!');
+}
 }
