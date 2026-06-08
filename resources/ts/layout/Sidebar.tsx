@@ -1,29 +1,65 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import "../styles/sidebar.css";
 
 export default function Sidebar() {
+    const { auth } = usePage().props as any;
+    const isAdmin = auth?.user?.role === "admin";
+
     return (
         <aside className="sidebar">
-            <h2>Painel Administrativo</h2>
+            <div className="sidebar__logo">
+                <div className="sidebar__logo-name">
+                    Sistema<span>Gerenciais </span>
+                </div>
+                <div className="sidebar__logo-sub">
+                    {isAdmin
+                        ? "Painel Administrativo"
+                        : "Portal do Colaborador"}
+                </div>
+            </div>
 
-            <nav>
-                <ul>
-                    <li>
-                        <Link href="/dashboard">Dashboard</Link>
-                    </li>
-                    <li>
-                        <Link href="/equipamentos">Equipamentos</Link>
-                    </li>
-
-                    <li>
-                        <Link href="/funcionarios">Funcionários</Link>
-                    </li>
-
-                    <li>
-                        <Link href="/emprestimos">Empréstimos</Link>
-                    </li>
-                </ul>
+            <nav className="sidebar__nav">
+                {isAdmin ? (
+                    <>
+                        <Link href="/dashboard" className="sidebar__item">
+                            Dashboard
+                        </Link>
+                        <Link href="/equipamentos" className="sidebar__item">
+                            Equipamentos
+                        </Link>
+                        <Link href="/funcionarios" className="sidebar__item">
+                            Funcionários
+                        </Link>
+                        <Link href="/emprestimos" className="sidebar__item">
+                            Empréstimos
+                        </Link>
+                        <Link
+                            href="/solicitacoes/admin"
+                            className="sidebar__item"
+                        >
+                            Solicitações
+                        </Link>
+                    </>
+                ) : (
+                    <Link
+                        href="/solicitacoes"
+                        className="sidebar__item sidebar__item--active"
+                    >
+                        Minhas Solicitações
+                    </Link>
+                )}
             </nav>
+
+            <div className="sidebar__footer">
+                <Link
+                    href="/logout"
+                    method="post"
+                    as="button"
+                    className="sidebar__logout"
+                >
+                    Sair
+                </Link>
+            </div>
         </aside>
     );
 }
