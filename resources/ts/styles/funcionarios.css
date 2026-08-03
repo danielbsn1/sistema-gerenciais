@@ -1,9 +1,9 @@
-/* ── Funcionários: form específico ───────────────────────── */
+
 .funcionario-form .form-group--full {
     grid-column: 1 / -1;
 }
 
-/* Tipo badge (interno / externo) */
+
 .tipo-badge {
     display: inline-flex;
     align-items: center;

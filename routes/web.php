@@ -8,6 +8,8 @@ use App\Http\Controllers\EquipamentoController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\EmprestimoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SolicitacaoController;
+
 
 Route::middleware(['auth'])->group(function () {
 
@@ -15,19 +17,22 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('dashboard');
     });
 
+    // Rotas para usuários comuns
+    Route::get('/solicitacoes', [SolicitacaoController::class, 'index'])->name('solicitacoes.index');
+    Route::post('/solicitacoes', [SolicitacaoController::class, 'store'])->name('solicitacoes.store');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+
     
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Equipamentos
-    |--------------------------------------------------------------------------
-    */
+    Route::get('/solicitacoes/admin', [SolicitacaoController::class, 'adminIndex'])->name('solicitacoes.admin');
+Route::patch('/solicitacoes/{solicitacao}/avaliar', [SolicitacaoController::class, 'avaliar'])->name('solicitacoes.avaliar');
 
-    Route::get('/equipamentos', [EquipamentoController::class, 'index'])
-        ->name('equipamentos.index');
+Route::get('/equipamentos', [EquipamentoController::class, 'index'])
+    ->name('equipamentos.index');
 
     Route::get('/equipamentos/create', [EquipamentoController::class, 'create'])
         ->name('equipamentos.create');
@@ -48,11 +53,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('equipamentos.destroy');
 
    
-    /*
-    |--------------------------------------------------------------------------
-    | Funcionários
-    |--------------------------------------------------------------------------
-    */
+    
 
     Route::get('/funcionarios', [FuncionarioController::class, 'index'])
         ->name('funcionarios.index');
@@ -78,11 +79,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/funcionarios/{funcionario}', [FuncionarioController::class, 'destroy'])
         ->name('funcionarios.destroy');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Empréstimos
-    |--------------------------------------------------------------------------
-    */
+    
 
     Route::get('/emprestimos', [EmprestimoController::class, 'index'])
         ->name('emprestimos.index');

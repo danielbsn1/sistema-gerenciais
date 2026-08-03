@@ -1,4 +1,4 @@
-/* ── Card ────────────────────────────────────────────────── */
+
 .card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -15,7 +15,7 @@
     margin-bottom: 20px;
 }
 
-/* ── Filtros ─────────────────────────────────────────────── */
+
 .filters-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -72,7 +72,7 @@
     cursor: pointer;
 }
 
-/* ── Tabela ──────────────────────────────────────────────── */
+
 .table-wrapper {
     overflow-x: auto;
 }

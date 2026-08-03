@@ -2,28 +2,44 @@ import { Link, useForm } from "@inertiajs/react";
 import "../../styles/auth.css";
 import "../../styles/form.css";
 
-export default function Login() {
+export default function Register() {
     const { data, setData, post, processing, errors } = useForm({
+        name: "",
         email: "",
         password: "",
+        password_confirmation: "",
     });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post("/login");
+        post("/register");
     }
 
     return (
         <div className="auth-page">
             <div className="auth-card">
                 <div className="auth-header">
-                    <h1 className="auth-logo">
-                        Sistema<span>Gerenciais</span>
-                    </h1>
-                    <p className="auth-subtitle">Faça login para continuar</p>
+                    <h1 className="auth-logo">Sistema Gerenciais</h1>
+                    <p className="auth-subtitle">
+                        Crie sua conta para solicitar equipamentos
+                    </p>
                 </div>
 
                 <form onSubmit={submit} className="auth-form">
+                    <div className="form-group">
+                        <label className="form-label">Nome completo</label>
+                        <input
+                            type="text"
+                            className={`form-input ${errors.name ? "is-error" : ""}`}
+                            placeholder="Seu nome"
+                            value={data.name}
+                            onChange={(e) => setData("name", e.target.value)}
+                        />
+                        {errors.name && (
+                            <span className="form-error">{errors.name}</span>
+                        )}
+                    </div>
+
                     <div className="form-group">
                         <label className="form-label">E-mail</label>
                         <input
@@ -56,18 +72,31 @@ export default function Login() {
                         )}
                     </div>
 
+                    <div className="form-group">
+                        <label className="form-label">Confirmar senha</label>
+                        <input
+                            type="password"
+                            className="form-input"
+                            placeholder="••••••••"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData("password_confirmation", e.target.value)
+                            }
+                        />
+                    </div>
+
                     <button
                         type="submit"
                         disabled={processing}
                         className="btn btn--primary"
                         style={{ marginTop: 8 }}
                     >
-                        {processing ? "Entrando..." : "Entrar"}
+                        {processing ? "Criando conta..." : "Criar conta"}
                     </button>
                 </form>
 
                 <p className="auth-footer">
-                    Não tem conta? <Link href="/register">Criar conta</Link>
+                    Já tem conta? <Link href="/login">Fazer login</Link>
                 </p>
             </div>
         </div>

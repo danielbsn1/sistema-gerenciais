@@ -1,4 +1,4 @@
-/* ── Base ─────────────────────────────────────────────────── */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -24,7 +24,7 @@
     pointer-events: none;
 }
 
-/* ── Sizes ───────────────────────────────────────────────── */
+
 .btn--sm {
     height: 32px;
     padding: 0 12px;
@@ -38,7 +38,7 @@
     font-size: 0.9375rem;
 }
 
-/* ── Variants ────────────────────────────────────────────── */
+
 .btn--primary {
     background: var(--brand);
     color: #fff;
@@ -80,7 +80,7 @@
     color: var(--text-primary);
 }
 
-/* ── Link-style (tabela) ─────────────────────────────────── */
+
 .btn--link {
     background: var(--brand-light);
     color: var(--brand);
@@ -123,7 +123,7 @@
     color: var(--brand-hover);
 }
 
-/* ── Ghost text (Limpar) ─────────────────────────────────── */
+
 .btn--ghost-text {
     background: transparent;
     border: none;
