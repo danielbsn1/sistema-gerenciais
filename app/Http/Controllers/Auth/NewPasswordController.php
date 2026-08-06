@@ -15,13 +15,11 @@ use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
-    
     public function create(Request $request): View
     {
         return view('auth.reset-password', ['request' => $request]);
     }
 
-    
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -30,7 +28,6 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-       
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user) use ($request) {
@@ -43,7 +40,6 @@ class NewPasswordController extends Controller
             }
         );
 
-       
         return $status == Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
                     : back()->withInput($request->only('email'))

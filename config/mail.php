@@ -2,11 +2,7 @@
 
 return [
 
-    
-
     'default' => env('MAIL_MAILER', 'log'),
-
-   
 
     'mailers' => [
 
@@ -28,7 +24,7 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-           
+
         ],
 
         'resend' => [
@@ -68,8 +64,6 @@ return [
         ],
 
     ],
-
-   
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

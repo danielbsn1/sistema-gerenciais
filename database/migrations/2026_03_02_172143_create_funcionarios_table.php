@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('funcionarios', function (Blueprint $table) {
@@ -15,7 +14,7 @@ return new class extends Migration
             $table->string('cpf', 14)->unique();
             $table->string('email')->nullable();
             $table->string('telefone', 20)->nullable();
-            $table->string('setor');              
+            $table->string('setor');
             $table->string('cargo')->nullable();
             $table->string('endereco')->nullable();
             $table->string('cidade')->nullable();
@@ -27,7 +26,6 @@ return new class extends Migration
         });
 
     }
-
 
     public function down(): void
     {

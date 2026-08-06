@@ -39,16 +39,16 @@ class SolicitacaoController extends Controller
 
         $solicitacao->update(['status' => $request->status]);
 
-        return back()->with('success', 'Solicitação ' . $request->status . ' com sucesso!');
+        return back()->with('success', 'Solicitação '.$request->status.' com sucesso!');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'tipo_equipamento' => 'required|string',
-            'motivo'           => 'required|string|max:255',
-            'urgencia'         => 'required|in:baixa,media,alta',
-            'observacoes'      => 'nullable|string',
+            'motivo' => 'required|string|max:255',
+            'urgencia' => 'required|in:baixa,media,alta',
+            'observacoes' => 'nullable|string',
         ]);
 
         Solicitacao::create([

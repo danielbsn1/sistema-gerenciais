@@ -1,15 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmprestimoController;
 use App\Http\Controllers\EquipamentoController;
 use App\Http\Controllers\FuncionarioController;
-use App\Http\Controllers\EmprestimoController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SolicitacaoController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -24,15 +21,13 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
 
-    
-
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/solicitacoes/admin', [SolicitacaoController::class, 'adminIndex'])->name('solicitacoes.admin');
-Route::patch('/solicitacoes/{solicitacao}/avaliar', [SolicitacaoController::class, 'avaliar'])->name('solicitacoes.avaliar');
+    Route::patch('/solicitacoes/{solicitacao}/avaliar', [SolicitacaoController::class, 'avaliar'])->name('solicitacoes.avaliar');
 
-Route::get('/equipamentos', [EquipamentoController::class, 'index'])
-    ->name('equipamentos.index');
+    Route::get('/equipamentos', [EquipamentoController::class, 'index'])
+        ->name('equipamentos.index');
 
     Route::get('/equipamentos/create', [EquipamentoController::class, 'create'])
         ->name('equipamentos.create');
@@ -43,6 +38,8 @@ Route::get('/equipamentos', [EquipamentoController::class, 'index'])
     Route::get('/equipamentos/{equipamento}', [EquipamentoController::class, 'show'])
         ->name('equipamentos.show');
 
+    Route::patch('/equipamentos/{equipamento}/status', [EquipamentoController::class, 'mudarStatus'])->name('equiapamentos.status');
+
     Route::get('/equipamentos/{equipamento}/edit', [EquipamentoController::class, 'edit'])
         ->name('equipamentos.edit');
 
@@ -51,9 +48,6 @@ Route::get('/equipamentos', [EquipamentoController::class, 'index'])
 
     Route::delete('/equipamentos/{equipamento}', [EquipamentoController::class, 'destroy'])
         ->name('equipamentos.destroy');
-
-   
-    
 
     Route::get('/funcionarios', [FuncionarioController::class, 'index'])
         ->name('funcionarios.index');
@@ -79,8 +73,6 @@ Route::get('/equipamentos', [EquipamentoController::class, 'index'])
     Route::delete('/funcionarios/{funcionario}', [FuncionarioController::class, 'destroy'])
         ->name('funcionarios.destroy');
 
-    
-
     Route::get('/emprestimos', [EmprestimoController::class, 'index'])
         ->name('emprestimos.index');
 
@@ -103,10 +95,10 @@ Route::get('/equipamentos', [EquipamentoController::class, 'index'])
         ->name('emprestimos.destroy');
 
     Route::patch('/emprestimos/{emprestimo}/devolver', [EmprestimoController::class, 'devolver'])
-        ->name('emprestimos.devolver'); 
+        ->name('emprestimos.devolver');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

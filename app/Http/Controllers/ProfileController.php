@@ -11,14 +11,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-
     public function edit(Request $request): View
     {
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
     }
-
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -32,7 +30,6 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
-
 
     public function destroy(Request $request): RedirectResponse
     {

@@ -2,7 +2,6 @@ import { FC, useState } from "react";
 import { router } from "@inertiajs/react";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
 import "../../components/table/EquipamentoTable";
 import { Equipamento } from "../../types/funcionarios";
 import "../../styles/equipamentos.css";
@@ -21,7 +20,7 @@ const TIPOS = [
     "Impressora",
     "Outros",
 ];
-const STATUS = ["disponivel", "em_uso", "manutencao"];
+const STATUS = ["disponivel", "em_uso", "manutencao", "inativo"];
 
 const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
@@ -33,6 +32,13 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
             "/equipamentos",
             { search, tipo, status },
             { preserveState: true },
+        );
+    };
+
+    const handleStatus = (id: number, status: string) => {
+        router.patch(`/equipamentos/${id}/status`,
+            { status },
+            { preserveScroll: true },
         );
     };
 
@@ -100,11 +106,7 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                         <option value="">Todos</option>
                         {STATUS.map((s) => (
                             <option key={s} value={s}>
-                                {s === "disponivel"
-                                    ? "Disponível"
-                                    : s === "em_uso"
-                                      ? "Em Uso"
-                                      : "Manutenção"}
+                                {s === "disponivel" ? "Disponível" : s === "em_uso" ? "Em Uso" : s === "manutencao" ? "Inativo" : "Inativo"}
                             </option>
                         ))}
                     </select>
@@ -169,7 +171,14 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                                             {eq.marca} {eq.modelo}
                                         </td>
                                         <td>
-                                            <Badge variant={eq.status} />
+                                            <select
+                                                value={eq.status}
+                                                onChange={(e) => handleStatus(eq.id, e.target.value)}
+                                            >
+                                                {STATUS.map((s) => (
+                                                    <option key={s} value={s}>{s}</option>
+                                                ))}
+                                            </select>
                                         </td>
                                         <td>{eq.usuario_atual ?? "—"}</td>
                                         <td>

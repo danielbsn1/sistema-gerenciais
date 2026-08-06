@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Equipamento;
 use App\Models\Funcionario;
-use App\Models\Emprestimo;
 use Inertia\Inertia;
 
 class DashboardController extends Controller

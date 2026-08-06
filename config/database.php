@@ -4,11 +4,7 @@ use Illuminate\Support\Str;
 
 return [
 
-    
-
     'default' => env('DB_CONNECTION', 'sqlite'),
-
-   
 
     'connections' => [
 
@@ -90,19 +86,15 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            
+
         ],
 
     ],
-
-   
 
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
     ],
-
-    
 
     'redis' => [
 

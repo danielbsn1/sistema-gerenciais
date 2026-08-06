@@ -15,13 +15,11 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
- 
     public function create(): Response
     {
         return Inertia::render('Auth/Register');
     }
 
-   
     public function store(Request $request): RedirectResponse
     {
         $request->validate([

@@ -8,33 +8,38 @@ use App\Models\Funcionario;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class EmprestimoController extends Controller
 {
     public function index(Request $request)
     {
         $query = Emprestimo::with(['equipamento', 'funcionario']);
 
-        if ($request->status)      $query->where('status', $request->status);
-        if ($request->tipo)        $query->whereHas('equipamento', fn($q) => $q->where('tipo', $request->tipo));
-        if ($request->funcionario) $query->whereHas('funcionario', fn($q) =>
-                                         $q->where('nome', 'like', "%{$request->funcionario}%"));
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->tipo) {
+            $query->whereHas('equipamento', fn ($q) => $q->where('tipo', $request->tipo));
+        }
+        if ($request->funcionario) {
+            $query->whereHas('funcionario', fn ($q) => $q->where('nome', 'like', "%{$request->funcionario}%"));
+        }
 
         $emprestimos = $query->latest()->get();
+
         return \Inertia\Inertia::render('Emprestimos/Index',
-         ['emprestimos' => $emprestimos]);
+            ['emprestimos' => $emprestimos]);
     }
 
     public function create()
-{
-    $equipamentos = Equipamento::where('status', 'disponivel')->get();
-    $funcionarios = Funcionario::all();
+    {
+        $equipamentos = Equipamento::where('status', 'disponivel')->get();
+        $funcionarios = Funcionario::all();
 
-    return Inertia::render('Emprestimos/Create', [
-        'equipamentos' => $equipamentos,
-        'funcionarios' => $funcionarios,
-    ]);
-}
+        return Inertia::render('Emprestimos/Create', [
+            'equipamentos' => $equipamentos,
+            'funcionarios' => $funcionarios,
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -45,18 +50,18 @@ class EmprestimoController extends Controller
 
         $equipamento = Equipamento::findOrFail($request->equipamento_id);
 
-        if (!$equipamento->isDisponivel()) {
+        if (! $equipamento->isDisponivel()) {
             return back()->withErrors(['equipamento_id' => 'Equipamento não disponível.']);
         }
 
-       Emprestimo::create([
-    'equipamento_id' => $request->equipamento_id,
-    'funcionario_id' => $request->funcionario_id,
-     'admin_id' => 1,
-    'data_saida'     => now(),
-    'status'         => 'ativo',
-    'observacoes'    => $request->observacoes,
-]);
+        Emprestimo::create([
+            'equipamento_id' => $request->equipamento_id,
+            'funcionario_id' => $request->funcionario_id,
+            'admin_id' => $request->user()->id,
+            'data_saida' => now(),
+            'status' => 'ativo',
+            'observacoes' => $request->observacoes,
+        ]);
 
         $equipamento->update(['status' => 'em_uso']);
 
@@ -66,7 +71,7 @@ class EmprestimoController extends Controller
     public function devolver(Emprestimo $emprestimo)
     {
         $emprestimo->update([
-            'status'         => 'devolvido',
+            'status' => 'devolvido',
             'data_devolucao' => now(),
         ]);
 
@@ -75,33 +80,15 @@ class EmprestimoController extends Controller
         return back()->with('success', 'Devolução registrada!');
     }
 
-     public function show(Emprestimo $emprestimo)
-{
-    $emprestimo->load([
-        'equipamento',
-        'funcionario',
-    ]);
+    public function show(Emprestimo $emprestimo)
+    {
+        $emprestimo->load([
+            'equipamento',
+            'funcionario',
+        ]);
 
-    return Inertia::render('Emprestimos/Show', [
-        'emprestimo' => $emprestimo,
-    ]);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return Inertia::render('Emprestimos/Show', [
+            'emprestimo' => $emprestimo,
+        ]);
+    }
 }

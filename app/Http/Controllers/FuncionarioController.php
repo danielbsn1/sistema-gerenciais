@@ -5,25 +5,30 @@ namespace App\Http\Controllers;
 use App\Models\Funcionario;
 use Illuminate\Http\Request;
 
-
 class FuncionarioController extends Controller
 {
     public function index(Request $request)
     {
         $query = Funcionario::with('emprestimoAtivo.equipamento');
 
-        if ($request->search) $query->where(function($q) use ($request) {
-            $q->where('nome', 'like', "%{$request->search}%")
-              ->orWhere('cpf', 'like', "%{$request->search}%");
-        });
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nome', 'like', "%{$request->search}%")
+                    ->orWhere('cpf', 'like', "%{$request->search}%");
+            });
+        }
 
-        if ($request->setor) $query->where('setor', 'like', "%{$request->setor}%");
-        if ($request->tipo)  $query->where('tipo', $request->tipo);
+        if ($request->setor) {
+            $query->where('setor', 'like', "%{$request->setor}%");
+        }
+        if ($request->tipo) {
+            $query->where('tipo', $request->tipo);
+        }
 
         $funcionarios = $query->orderBy('nome')->get();
 
-        return \Inertia\Inertia::render('Funcionarios/Index', 
-        ['funcionarios' => $funcionarios]);
+        return \Inertia\Inertia::render('Funcionarios/Index',
+            ['funcionarios' => $funcionarios]);
     }
 
     public function create()
@@ -34,8 +39,8 @@ class FuncionarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nome'  => 'required',
-            'cpf'   => 'required|unique:funcionarios',
+            'nome' => 'required',
+            'cpf' => 'required|unique:funcionarios',
             'setor' => 'required',
         ]);
 
@@ -47,6 +52,7 @@ class FuncionarioController extends Controller
     public function show(Funcionario $funcionario)
     {
         $historico = $funcionario->emprestimos()->with('equipamento')->latest()->get();
+
         return \Inertia\Inertia::render('Funcionarios/Show', ['funcionario' => $funcionario, 'historico' => $historico]);
     }
 
@@ -58,8 +64,8 @@ class FuncionarioController extends Controller
     public function update(Request $request, Funcionario $funcionario)
     {
         $request->validate([
-            'nome'  => 'required',
-            'cpf'   => 'required|unique:funcionarios,cpf,' . $funcionario->id,
+            'nome' => 'required',
+            'cpf' => 'required|unique:funcionarios,cpf,'.$funcionario->id,
             'setor' => 'required',
         ]);
 
@@ -70,14 +76,16 @@ class FuncionarioController extends Controller
 
     public function inativar(Funcionario $funcionario)
     {
-        $funcionario->update(['ativo' => !$funcionario->ativo]);
+        $funcionario->update(['ativo' => ! $funcionario->ativo]);
         $status = $funcionario->ativo ? 'ativado' : 'inativado';
+
         return back()->with('success', "Funcionário {$status}!");
     }
 
     public function destroy(Funcionario $funcionario)
     {
         $funcionario->delete();
+
         return redirect()->route('funcionarios.index')->with('success', 'Removido!');
     }
 }
