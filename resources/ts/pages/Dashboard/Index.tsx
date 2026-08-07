@@ -1,7 +1,8 @@
-import AppLayout from "../../layout/AppLayout";
+import AppLayout from "../../components/layout/AppLayout";
 import StatCard from "../../components/cards/StatCard";
 import { FaUsers, FaBox, FaTools, FaCheckCircle } from "react-icons/fa";
 import "../../styles/dashboard.css";
+import { ChartPieInteractive } from "./chartds";
 
 interface Props {
     totalEquipamentos: number;
@@ -51,6 +52,8 @@ export default function Dashboard({
                     value={funcionarios}
                     icon={<FaUsers />}
                 />
+
+                <ChartPieInteractive />
             </div>
         </AppLayout>
     );

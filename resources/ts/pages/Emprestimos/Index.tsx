@@ -1,9 +1,17 @@
 // resources/ts/pages/Emprestimos/Index.tsx
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Emprestimo } from "../../types/funcionarios";
 import "../../styles/form.css";
 import "../../styles/equipamentos.css";
@@ -63,12 +71,12 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
                     </select>
                 </div>
 
-                <Button variant="primary" onClick={handleFilter}>
+                <Button onClick={handleFilter}>
                     Filtrar
                 </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
+                <Button variant="ghost" onClick={handleClear}>
                     Limpar
-                </button>
+                </Button>
             </div>
 
             {/* Table */}
@@ -78,113 +86,89 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
                         {emprestimos.length} empréstimo(s)
                     </span>
                     <Button
-                        as="link"
-                        href="/emprestimos/create"
-                        variant="primary"
+                        render={<Link href="/emprestimos/create" />}
                         size="sm"
                     >
                         + Novo Empréstimo
                     </Button>
                 </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Equipamento</th>
-                                <th>Funcionário</th>
-                                <th>Setor</th>
-                                <th>Início</th>
-                                <th>Prev. Devolução</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {emprestimos.length === 0 ? (
-                                <tr>
-                                    <td colSpan={7} className="table__empty">
-                                        Nenhum empréstimo registrado.
-                                    </td>
-                                </tr>
-                            ) : (
-                                emprestimos.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>
-                                            {emp.equipamento.marca}{" "}
-                                            {emp.equipamento.modelo}
-                                            <div
-                                                style={{
-                                                    fontSize: 11,
-                                                    color: "var(--text-muted)",
-                                                    fontFamily: "monospace",
-                                                }}
+                <Table>
+                    <TableHeader>
+                        <tr>
+                            <TableHead>Equipamento</TableHead>
+                            <TableHead>Funcionário</TableHead>
+                            <TableHead>Setor</TableHead>
+                            <TableHead>Início</TableHead>
+                            <TableHead>Prev. Devolução</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Ações</TableHead>
+                        </tr>
+                    </TableHeader>
+                    <TableBody>
+                        {emprestimos.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                                    Nenhum empréstimo registrado.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            emprestimos.map((emp) => (
+                                <TableRow key={emp.id}>
+                                    <TableCell>
+                                        {emp.equipamento.marca}{" "}
+                                        {emp.equipamento.modelo}
+                                        <div className="font-mono text-[11px] text-muted-foreground">
+                                            #{emp.equipamento.id_patrimonio}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{emp.funcionario.nome}</TableCell>
+                                    <TableCell>{emp.setor}</TableCell>
+                                    <TableCell className="tabular-nums">
+                                        {new Date(
+                                            emp.data_inicio,
+                                        ).toLocaleDateString("pt-BR")}
+                                    </TableCell>
+                                    <TableCell className="tabular-nums">
+                                        {emp.data_prevista_devolucao
+                                            ? new Date(
+                                                emp.data_prevista_devolucao,
+                                            ).toLocaleDateString("pt-BR")
+                                            : "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={emp.status} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                render={<Link href={`/emprestimos/${emp.id}`} />}
+                                                variant="link"
+                                                size="sm"
                                             >
-                                                #{emp.equipamento.id_patrimonio}
-                                            </div>
-                                        </td>
-                                        <td>{emp.funcionario.nome}</td>
-                                        <td>
-                                            <span className="chip">
-                                                {emp.setor}
-                                            </span>
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontVariantNumeric:
-                                                    "tabular-nums",
-                                            }}
-                                        >
-                                            {new Date(
-                                                emp.data_inicio,
-                                            ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontVariantNumeric:
-                                                    "tabular-nums",
-                                            }}
-                                        >
-                                            {emp.data_prevista_devolucao
-                                                ? new Date(
-                                                      emp.data_prevista_devolucao,
-                                                  ).toLocaleDateString("pt-BR")
-                                                : "—"}
-                                        </td>
-                                        <td>
-                                            <Badge variant={emp.status} />
-                                        </td>
-                                        <td>
-                                            <div className="table__actions">
+                                                Ver
+                                            </Button>
+                                            {emp.status === "ativo" && (
                                                 <Button
-                                                    as="link"
-                                                    href={`/emprestimos/${emp.id}`}
                                                     variant="link"
                                                     size="sm"
+                                                    className="text-destructive hover:text-destructive"
+                                                    onClick={() =>
+                                                        handleDevolver(
+                                                            emp.id,
+                                                        )
+                                                    }
                                                 >
-                                                    Ver
+                                                    Devolver
                                                 </Button>
-                                                {emp.status === "ativo" && (
-                                                    <Button
-                                                        variant="link-warning"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleDevolver(
-                                                                emp.id,
-                                                            )
-                                                        }
-                                                    >
-                                                        Devolver
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </AppLayout>
     );

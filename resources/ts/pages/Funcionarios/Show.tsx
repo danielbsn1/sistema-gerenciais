@@ -1,11 +1,24 @@
 // resources/ts/pages/Funcionarios/Show.tsx
 // resources/ts/pages/Funcionarios/Show.tsx
 import { FC } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
-import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from "@/components/ui/card";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Funcionario, Emprestimo } from "../../types/funcionarios";
 import "../../styles/showeq.css";
 import "../../styles/equipamentos.css";
@@ -24,11 +37,11 @@ const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
                     <p>{funcionario.cpf}</p>
                 </div>
                 <div className="page-header__actions">
-                    <Button as="link" href="/funcionarios" variant="secondary" size="sm">
+                    <Button render={<Link href="/funcionarios" />} variant="outline" size="sm">
                         ← Voltar
                     </Button>
                     <Button
-                        variant={funcionario.ativo ? "danger" : "primary"}
+                        variant={funcionario.ativo ? "destructive" : "default"}
                         size="sm"
                         onClick={() => {
                             const acao = funcionario.ativo ? "inativar" : "ativar";
@@ -39,15 +52,17 @@ const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
                     >
                         {funcionario.ativo ? "Inativar" : "Ativar"}
                     </Button>
-                    <Button as="link" href={`/funcionarios/${funcionario.id}/edit`} variant="primary" size="sm">
+                    <Button render={<Link href={`/funcionarios/${funcionario.id}/edit`} />} size="sm">
                         Editar
                     </Button>
                 </div>
             </div>
 
-            <Card style={{ marginBottom: 20 }}>
-                <CardHeader title="Dados do Funcionário" />
-                <CardBody>
+            <Card className="mb-5">
+                <CardHeader>
+                    <CardTitle>Dados do Funcionário</CardTitle>
+                </CardHeader>
+                <CardContent>
                     <div className="detail-grid">
                         <div className="detail-item">
                             <span className="detail-label">Nome</span>
@@ -75,7 +90,7 @@ const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
                         <div className="detail-item">
                             <span className="detail-label">Tipo</span>
                             <div style={{ marginTop: 4 }}>
-                                <Badge variant={funcionario.tipo} />
+                                <StatusBadge status={funcionario.tipo} />
                             </div>
                         </div>
                         <div className="detail-item">
@@ -87,65 +102,60 @@ const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
                             </span>
                         </div>
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
 
             <Card>
-                <CardHeader title="Histórico de Empréstimos" />
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Equipamento</th>
-                                <th>ID Patrimônio</th>
-                                <th>Início</th>
-                                <th>Devolução</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {historico.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} className="table__empty">
-                                        Nenhum empréstimo registrado.
-                                    </td>
-                                </tr>
-                            ) : (
-                                historico.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>
-                                            {emp.equipamento.marca}{" "}
-                                            {emp.equipamento.modelo}
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontFamily: "monospace",
-                                                fontSize: 13,
-                                            }}
-                                        >
-                                            #{emp.equipamento.id_patrimonio}
-                                        </td>
-                                        <td>
-                                            {new Date(
-                                                emp.data_inicio,
-                                            ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td>
-                                            {emp.data_devolucao
-                                                ? new Date(
-                                                      emp.data_devolucao,
-                                                  ).toLocaleDateString("pt-BR")
-                                                : "—"}
-                                        </td>
-                                        <td>
-                                            <Badge variant={emp.status} />
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <CardHeader>
+                    <CardTitle>Histórico de Empréstimos</CardTitle>
+                </CardHeader>
+                <Table>
+                    <TableHeader>
+                        <tr>
+                            <TableHead>Equipamento</TableHead>
+                            <TableHead>ID Patrimônio</TableHead>
+                            <TableHead>Início</TableHead>
+                            <TableHead>Devolução</TableHead>
+                            <TableHead>Status</TableHead>
+                        </tr>
+                    </TableHeader>
+                    <TableBody>
+                        {historico.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                    Nenhum empréstimo registrado.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            historico.map((emp) => (
+                                <TableRow key={emp.id}>
+                                    <TableCell>
+                                        {emp.equipamento.marca}{" "}
+                                        {emp.equipamento.modelo}
+                                    </TableCell>
+                                    <TableCell className="font-mono text-[13px]">
+                                        #{emp.equipamento.id_patrimonio}
+                                    </TableCell>
+                                    <TableCell>
+                                        {new Date(
+                                            emp.data_inicio,
+                                        ).toLocaleDateString("pt-BR")}
+                                    </TableCell>
+                                    <TableCell>
+                                        {emp.data_devolucao
+                                            ? new Date(
+                                                emp.data_devolucao,
+                                            ).toLocaleDateString("pt-BR")
+                                            : "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={emp.status} />
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </Card>
         </AppLayout>
     );

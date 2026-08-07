@@ -1,14 +1,22 @@
 // resources/ts/pages/Funcionarios/Index.tsx
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Funcionario } from "../../types/funcionarios";
-
-type FuncionarioComAtivo = Funcionario & { ativo: boolean };
 import "../../styles/equipamentos.css";
 import "../../styles/showeq.css";
+
+type FuncionarioComAtivo = Funcionario & { ativo: boolean };
 
 interface Props {
     funcionarios: FuncionarioComAtivo[];
@@ -73,12 +81,12 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
                     </select>
                 </div>
 
-                <Button variant="primary" onClick={handleFilter}>
+                <Button onClick={handleFilter}>
                     Filtrar
                 </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
+                <Button variant="ghost" onClick={handleClear}>
                     Limpar
-                </button>
+                </Button>
             </div>
 
             {/* Table */}
@@ -88,86 +96,79 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
                         {funcionarios.length} funcionário(s)
                     </span>
                     <Button
-                        as="link"
-                        href="/funcionarios/create"
-                        variant="primary"
+                        render={<Link href="/funcionarios/create" />}
                         size="sm"
                     >
                         + Cadastrar
                     </Button>
                 </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Setor</th>
-                                <th>Tipo</th>
-                                <th>Equipamento</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {funcionarios.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="table__empty">
-                                        Nenhum funcionário cadastrado.
-                                    </td>
-                                </tr>
-                            ) : (
-                                funcionarios.map((f) => (
-                                    <tr key={f.id}>
-                                        <td>{f.nome}</td>
-                                        <td style={{ fontFamily: "monospace", fontSize: 13 }}>
-                                            {f.cpf}
-                                        </td>
-                                        <td>
-                                            <span className="chip">{f.setor}</span>
-                                        </td>
-                                        <td>
-                                            <Badge variant={f.tipo} />
-                                        </td>
-                                        <td>{f.equipamento_atual ?? "—"}</td>
-                                        <td>
-                                            <div className="table__actions">
-                                                <Button
-                                                    as="link"
-                                                    href={`/funcionarios/${f.id}`}
-                                                    variant="link"
-                                                    size="sm"
-                                                >
-                                                    Ver
-                                                </Button>
-                                                <Button
-                                                    as="link"
-                                                    href={`/funcionarios/${f.id}/edit`}
-                                                    variant="link"
-                                                    size="sm"
-                                                >
-                                                    Editar
-                                                </Button>
-                                                <Button
-                                                    variant={f.ativo ? "link-danger" : "link"}
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        const acao = f.ativo ? "inativar" : "ativar";
-                                                        if (confirm(`Deseja ${acao} ${f.nome}?`)) {
-                                                            router.patch(`/funcionarios/${f.id}/inativar`, {}, { preserveScroll: true });
-                                                        }
-                                                    }}
-                                                >
-                                                    {f.ativo ? "Inativar" : "Ativar"}
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <Table>
+                    <TableHeader>
+                        <tr>
+                            <TableHead>Nome</TableHead>
+                            <TableHead>CPF</TableHead>
+                            <TableHead>Setor</TableHead>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Equipamento</TableHead>
+                            <TableHead>Ações</TableHead>
+                        </tr>
+                    </TableHeader>
+                    <TableBody>
+                        {funcionarios.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                    Nenhum funcionário cadastrado.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            funcionarios.map((f) => (
+                                <TableRow key={f.id}>
+                                    <TableCell>{f.nome}</TableCell>
+                                    <TableCell className="font-mono text-[13px]">
+                                        {f.cpf}
+                                    </TableCell>
+                                    <TableCell>{f.setor}</TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={f.tipo} />
+                                    </TableCell>
+                                    <TableCell>{f.equipamento_atual ?? "—"}</TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                render={<Link href={`/funcionarios/${f.id}`} />}
+                                                variant="link"
+                                                size="sm"
+                                            >
+                                                Ver
+                                            </Button>
+                                            <Button
+                                                render={<Link href={`/funcionarios/${f.id}/edit`} />}
+                                                variant="link"
+                                                size="sm"
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                variant="link"
+                                                size="sm"
+                                                className={f.ativo ? "text-destructive hover:text-destructive" : ""}
+                                                onClick={() => {
+                                                    const acao = f.ativo ? "inativar" : "ativar";
+                                                    if (confirm(`Deseja ${acao} ${f.nome}?`)) {
+                                                        router.patch(`/funcionarios/${f.id}/inativar`, {}, { preserveScroll: true });
+                                                    }
+                                                }}
+                                            >
+                                                {f.ativo ? "Inativar" : "Ativar"}
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </AppLayout>
     );

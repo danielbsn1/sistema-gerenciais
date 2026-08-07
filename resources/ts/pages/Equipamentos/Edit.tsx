@@ -1,14 +1,16 @@
 // resources/ts/pages/Equipamentos/Edit.tsx
 import { FC } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardHeader,
-    CardBody,
+    CardTitle,
+    CardDescription,
+    CardContent,
     CardFooter,
-} from "../../components/ui/Modal";
+} from "@/components/ui/card";
 import { Equipamento } from "../../types/funcionarios";
 
 interface Props {
@@ -47,12 +49,14 @@ const EquipamentosEdit: FC<Props> = ({ equipamento }) => {
     return (
         <AppLayout title="Equipamentos">
             <Card>
-                <CardHeader
-                    title="Editar Equipamento"
-                    subtitle={`#${equipamento.id_patrimonio} — ${equipamento.marca} ${equipamento.modelo}`}
-                />
+                <CardHeader>
+                    <CardTitle>Editar Equipamento</CardTitle>
+                    <CardDescription>
+                        {`#${equipamento.id_patrimonio} — ${equipamento.marca} ${equipamento.modelo}`}
+                    </CardDescription>
+                </CardHeader>
 
-                <CardBody>
+                <CardContent>
                     <form
                         onSubmit={handleSubmit}
                         className="form"
@@ -163,16 +167,15 @@ const EquipamentosEdit: FC<Props> = ({ equipamento }) => {
                             </div>
                         </div>
                     </form>
-                </CardBody>
+                </CardContent>
 
-                <CardFooter>
-                    <Button as="link" href="/equipamentos" variant="secondary">
+                <CardFooter className="gap-2">
+                    <Button render={<Link href="/equipamentos" />} variant="outline">
                         Cancelar
                     </Button>
                     <Button
                         type="submit"
                         form="edit-form"
-                        variant="primary"
                         disabled={processing}
                     >
                         {processing ? "Salvando..." : "Salvar Alterações"}

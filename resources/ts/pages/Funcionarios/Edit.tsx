@@ -1,14 +1,16 @@
 // resources/ts/pages/Funcionarios/Edit.tsx
 import { FC } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardHeader,
-    CardBody,
+    CardTitle,
+    CardDescription,
+    CardContent,
     CardFooter,
-} from "../../components/ui/Modal";
+} from "@/components/ui/card";
 import { Funcionario } from "../../types/funcionarios";
 
 interface Props {
@@ -31,12 +33,12 @@ const FuncionariosEdit: FC<Props> = ({ funcionario }) => {
     return (
         <AppLayout title="Funcionários">
             <Card>
-                <CardHeader
-                    title="Editar Funcionário"
-                    subtitle={funcionario.nome}
-                />
+                <CardHeader>
+                    <CardTitle>Editar Funcionário</CardTitle>
+                    <CardDescription>{funcionario.nome}</CardDescription>
+                </CardHeader>
 
-                <CardBody>
+                <CardContent>
                     <form
                         onSubmit={handleSubmit}
                         className="form"
@@ -119,16 +121,15 @@ const FuncionariosEdit: FC<Props> = ({ funcionario }) => {
                             </div>
                         </div>
                     </form>
-                </CardBody>
+                </CardContent>
 
-                <CardFooter>
-                    <Button as="link" href="/funcionarios" variant="secondary">
+                <CardFooter className="gap-2">
+                    <Button render={<Link href="/funcionarios" />} variant="outline">
                         Cancelar
                     </Button>
                     <Button
                         type="submit"
                         form="edit-func-form"
-                        variant="primary"
                         disabled={processing}
                     >
                         {processing ? "Salvando..." : "Salvar Alterações"}

@@ -10,6 +10,9 @@ import "./styles/dashboard.css";
 
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
+import { ThemeProvider } from "./components/theme/theme-provider";
+import { Toaster } from "./components/ui/toast";
+import FlashToasts from "./components/layout/FlashToasts";
 
 createInertiaApp({
     resolve: (name) => {
@@ -21,6 +24,12 @@ createInertiaApp({
     },
 
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <ThemeProvider>
+                <App {...props} />
+                <FlashToasts />
+                <Toaster />
+            </ThemeProvider>,
+        );
     },
 });

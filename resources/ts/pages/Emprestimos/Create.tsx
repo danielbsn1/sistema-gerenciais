@@ -1,7 +1,7 @@
 import { FC } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import "../../styles/form.css";
 import "../../styles/emprestimo.css";
 
@@ -112,10 +112,10 @@ const EmprestimosCreate: FC<Props> = ({
                         </div>
 
                         <div className="form-card__footer">
-                            <Button as="link" href="/emprestimos" variant="secondary">
+                            <Button render={<Link href="/emprestimos" />} variant="outline">
                                 Cancelar
                             </Button>
-                            <Button type="submit" variant="primary" disabled={processing}>
+                            <Button type="submit" disabled={processing}>
                                 {processing ? "Salvando..." : "Registrar Empréstimo"}
                             </Button>
                         </div>

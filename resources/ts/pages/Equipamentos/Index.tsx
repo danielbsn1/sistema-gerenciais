@@ -1,9 +1,16 @@
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
-import "../../components/table/EquipamentoTable";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Equipamento } from "../../types/funcionarios";
 import "../../styles/equipamentos.css";
 
@@ -103,19 +110,19 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                                 {s === "disponivel"
                                     ? "Disponível"
                                     : s === "em_uso"
-                                      ? "Em Uso"
-                                      : "Manutenção"}
+                                        ? "Em Uso"
+                                        : "Manutenção"}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                <Button variant="primary" onClick={handleFilter}>
+                <Button onClick={handleFilter}>
                     Filtrar
                 </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
+                <Button variant="ghost" onClick={handleClear}>
                     Limpar
-                </button>
+                </Button>
             </div>
 
             {/* Table Card */}
@@ -125,86 +132,76 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                         {equipamentos.length} equipamento(s)
                     </span>
                     <Button
-                        as="link"
-                        href="/equipamentos/create"
-                        variant="primary"
+                        render={<Link href="/equipamentos/create" />}
                         size="sm"
                     >
                         + Cadastrar
                     </Button>
                 </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>ID Patrimônio</th>
-                                <th>Tipo</th>
-                                <th>Equipamento</th>
-                                <th>Status</th>
-                                <th>Usuário</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {equipamentos.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="table__empty">
-                                        Nenhum equipamento cadastrado.
-                                    </td>
-                                </tr>
-                            ) : (
-                                equipamentos.map((eq) => (
-                                    <tr key={eq.id}>
-                                        <td
-                                            style={{
-                                                fontFamily: "monospace",
-                                                fontSize: 13,
-                                            }}
-                                        >
-                                            #{eq.id_patrimonio}
-                                        </td>
-                                        <td>{eq.tipo}</td>
-                                        <td>
-                                            {eq.marca} {eq.modelo}
-                                        </td>
-                                        <td>
-                                            <Badge variant={eq.status} />
-                                        </td>
-                                        <td>{eq.usuario_atual ?? "—"}</td>
-                                        <td>
-                                            <div className="table__actions">
-                                                <Button
-                                                    as="link"
-                                                    href={`/equipamentos/${eq.id}`}
-                                                    variant="link"
-                                                    size="sm"
-                                                >
-                                                    Ver
-                                                </Button>
-                                                <Button
-                                                    as="link"
-                                                    href={`/equipamentos/${eq.id}/edit`}
-                                                    variant="link-warning"
-                                                    size="sm"
-                                                >
-                                                    Editar
-                                                </Button>
-                                                <Button
-                                                    variant="link-danger"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(eq.id)}
-                                                >
-                                                    Excluir
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <Table>
+                    <TableHeader>
+                        <tr>
+                            <TableHead>ID Patrimônio</TableHead>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Equipamento</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Usuário</TableHead>
+                            <TableHead>Ações</TableHead>
+                        </tr>
+                    </TableHeader>
+                    <TableBody>
+                        {equipamentos.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                    Nenhum equipamento cadastrado.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            equipamentos.map((eq) => (
+                                <TableRow key={eq.id}>
+                                    <TableCell className="font-mono text-[13px]">
+                                        #{eq.id_patrimonio}
+                                    </TableCell>
+                                    <TableCell>{eq.tipo}</TableCell>
+                                    <TableCell>
+                                        {eq.marca} {eq.modelo}
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={eq.status} />
+                                    </TableCell>
+                                    <TableCell>{eq.usuario_atual ?? "—"}</TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                render={<Link href={`/equipamentos/${eq.id}`} />}
+                                                variant="link"
+                                                size="sm"
+                                            >
+                                                Ver
+                                            </Button>
+                                            <Button
+                                                render={<Link href={`/equipamentos/${eq.id}/edit`} />}
+                                                variant="link"
+                                                size="sm"
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                variant="link"
+                                                size="sm"
+                                                className="text-destructive hover:text-destructive"
+                                                onClick={() => handleDelete(eq.id)}
+                                            >
+                                                Excluir
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </AppLayout>
     );

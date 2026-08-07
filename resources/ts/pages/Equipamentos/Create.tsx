@@ -1,6 +1,6 @@
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import "../../styles/form.css";
 import "../../styles/equipamentos.css";
 
@@ -105,10 +105,10 @@ export default function EquipamentosCreate() {
                         </div>
 
                         <div className="form-card__footer">
-                            <Button as="link" href="/equipamentos" variant="secondary">
+                            <Button render={<Link href="/equipamentos" />} variant="outline">
                                 Cancelar
                             </Button>
-                            <Button type="submit" variant="primary" disabled={processing}>
+                            <Button type="submit" disabled={processing}>
                                 {processing ? "Salvando..." : "Cadastrar"}
                             </Button>
                         </div>
