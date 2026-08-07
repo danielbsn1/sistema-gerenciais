@@ -1,0 +1,652 @@
+# Roadmap de Arquitetura — Sistema Gerenciais
+
+Documento de planejamento e guia prático do projeto. A decisão atual é **manter
+a arquitetura monólito Laravel + Inertia.js** (simplicidade e custo de deploy),
+então este arquivo organiza as melhorias de código que valem a pena, com passo a
+passo para cada uma.
+
+> Baseado no `FLUXO_DO_SISTEMA.md` existente — consulte lá os detalhes de cada
+> módulo, schema de tabelas e comandos de ambiente.
+
+---
+
+## Decisão de arquitetura (06/08/2026)
+
+**Situação:** Laravel + Inertia.js — front e back no mesmo deploy.
+
+**Decisão:** continuar nessa arquitetura. Separar front (Vercel) + back (API)
+**não barateia** o deploy — pelo contrário, vira dois serviços + banco gerenciado.
+Um host único (Railway/Render/VPS ~$5/mês) roda a app inteira. Se um dia migrar
+para API + SPA, será por aprendizado/necessidade, não por custo.
+
+**Consequência para este documento:** não há "Fase 2 de migração" em andamento.
+O que resta é finalizar a Fase 1 (código correto e organizado no MVC atual).
+
+---
+
+## Fase 1 — Corrigir bugs e limpar a arquitetura atual (Inertia)
+
+Objetivo: deixar o código correto e organizado *dentro da estrutura MVC atual*.
+
+**O que muda e o que não muda nesta fase:**
+
+| Camada | Muda nesta fase? |
+|---|---|
+| Models (`Equipamento`, `Funcionario`, etc.) | Quase nada — só os bugs já corrigidos |
+| Regra de negócio | Sim — sai do controller e vira **Action** |
+| Validação | Sim — sai do controller e vira **Form Request** |
+| Controllers | Ficam finos — só orquestram Request → Action → Response (ainda via Inertia) |
+
+### 1.1 Corrigir bugs conhecidos — ✅ concluído
+
+- [x] `admin_id => 1` fixo — **já corrigido** (`EmprestimoController.php:60` usa
+      `$request->user()->id`).
+- [x] Relação `emprestimoAtivo` — **já corrigida** (`where('status', 'ativo')`
+      em `Equipamento.php:26` e `Funcionario.php:24`).
+- [x] Migration vazia `2026_03_02_202336_add_coluna_status_...` — **removida**.
+- [x] Coluna `inativo` duplicada no `Funcionario` — **removida** (model, migration
+      `2026_08_06_000001` e banco; front só usava `ativo`).
+- [x] Nome do banco (`sistema-gerenciais`) consistente entre `.env` e
+      `docker-compose.yml`.
+
+### 1.2 Notificação por e-mail — ✅ concluído
+
+- [x] `SolicitacaoStatusNotification` (`app/Notifications/`).
+- [x] Disparo em `SolicitacaoController@avaliar` para `$solicitacao->user`.
+- [x] Envio real via **Mailtrap SDK** (`railsware/mailtrap-php`), inbox `4843240`.
+      Testado: e-mail de "aprovada" chegou na inbox do Mailtrap.
+- [ ] **Opcional:** `MustVerifyEmail` no `User` (verificação de e-mail no cadastro,
+      hoje comentado). Não mexer se não for usar.
+
+---
+
+## Guia prático — melhorias para fazer à mão
+
+Os itens abaixo são os passos seguintes do roadmap. **Feitos à mão**, na ordem
+sugerida. Cada passo tem comando + código completo.
+
+### Passo 1 — Form Requests (validação fora do controller)
+
+Objetivo: tirar os `$request->validate([...])` dos controllers. Bônus: usar
+`$request->validated()` (evita passar campos extras no `create`).
+
+**Comandos:**
+
+```bash
+docker compose exec app php artisan make:request StoreEquipamentoRequest
+docker compose exec app php artisan make:request UpdateEquipamentoRequest
+docker compose exec app php artisan make:request UpdateStatusEquipamentoRequest
+docker compose exec app php artisan make:request StoreFuncionarioRequest
+docker compose exec app php artisan make:request UpdateFuncionarioRequest
+docker compose exec app php artisan make:request StoreEmprestimoRequest
+docker compose exec app php artisan make:request StoreSolicitacaoRequest
+docker compose exec app php artisan make:request AvaliarSolicitacaoRequest
+```
+
+**Regras de cada request** (copie de `FLUXO`/controllers atuais):
+
+| Request | Regras |
+|---|---|
+| `StoreEquipamentoRequest` | `patrimonio_id` required\|unique:equipamentos · `tipo` required\|in:tablet,notebook,desktop,monitor · `marca` required · `modelo` required |
+| `UpdateEquipamentoRequest` | igual, mas `unique:equipamentos,patrimonio_id,{equipamento}` |
+| `UpdateStatusEquipamentoRequest` | `status` required\|in:disponivel,em_uso,manutencao,inativo |
+| `StoreFuncionarioRequest` | `nome` required · `cpf` required\|unique:funcionarios · `setor` required |
+| `UpdateFuncionarioRequest` | igual, mas `unique:funcionarios,cpf,{funcionario}` |
+| `StoreEmprestimoRequest` | `equipamento_id` required\|exists:equipamentos,id · `funcionario_id` required\|exists:funcionarios,id |
+| `StoreSolicitacaoRequest` | `tipo_equipamento` required\|string · `motivo` required\|string\|max:255 · `urgencia` required\|in:baixa,media,alta · `observacoes` nullable\|string |
+| `AvaliarSolicitacaoRequest` | `status` required\|in:aprovada,recusada |
+
+**Exemplo completo — `app/Http/Requests/StoreEquipamentoRequest.php`:**
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreEquipamentoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true; // acesso já garantido pelo middleware admin
+    }
+
+    public function rules(): array
+    {
+        return [
+            'patrimonio_id' => 'required|unique:equipamentos',
+            'tipo' => 'required|in:tablet,notebook,desktop,monitor',
+            'marca' => 'required',
+            'modelo' => 'required',
+        ];
+    }
+}
+```
+
+**Como ligar no controller** (muda a assinatura e o `create`):
+
+```php
+use App\Http\Requests\StoreEquipamentoRequest;
+
+public function store(StoreEquipamentoRequest $request)
+{
+    Equipamento::create($request->validated());
+
+    return redirect()->route('equipamentos.index')->with('success', 'Equipamento cadastrado!');
+}
+```
+
+Mesmo padrão para os demais. O `Update*Request` usa o modelo na rota para a regra
+de `unique` ignorar o próprio registro:
+
+```php
+public function rules(): array
+{
+    return [
+        'patrimonio_id' => 'required|unique:equipamentos,patrimonio_id,'.$this->route('equipamento')->id,
+        'tipo' => 'required',
+        'marca' => 'required',
+        'modelo' => 'required',
+    ];
+}
+```
+
+---
+
+### Passo 2 — Actions (regra de negócio fora do controller)
+
+Objetivo: uma classe = uma operação, em `app/Actions/`. Só vale para regra **não
+trivial** (as 4 abaixo). CRUD simples continua no controller.
+
+**Exemplo — `app/Actions/RegistrarEmprestimoAction.php`:**
+
+```php
+<?php
+
+namespace App\Actions;
+
+use App\Models\Emprestimo;
+use App\Models\Equipamento;
+use App\Models\Funcionario;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
+
+class RegistrarEmprestimoAction
+{
+    public function execute(Equipamento $equipamento, Funcionario $funcionario, int $adminId, ?string $observacoes): Emprestimo
+    {
+        if (! $equipamento->isDisponivel()) {
+            throw new RuntimeException('Equipamento não disponível.');
+        }
+
+        return DB::transaction(function () use ($equipamento, $funcionario, $adminId, $observacoes) {
+            $emprestimo = Emprestimo::create([
+                'equipamento_id' => $equipamento->id,
+                'funcionario_id' => $funcionario->id,
+                'admin_id' => $adminId,
+                'data_saida' => now(),
+                'status' => 'ativo',
+                'observacoes' => $observacoes,
+            ]);
+
+            $equipamento->update(['status' => 'em_uso']);
+
+            return $emprestimo;
+        });
+    }
+}
+```
+
+**Controller enxuto usando a action:**
+
+```php
+use App\Actions\RegistrarEmprestimoAction;
+use App\Http\Requests\StoreEmprestimoRequest;
+use App\Models\Equipamento;
+use App\Models\Funcionario;
+
+public function store(StoreEmprestimoRequest $request)
+{
+    try {
+        app(RegistrarEmprestimoAction::class)->execute(
+            Equipamento::findOrFail($request->equipamento_id),
+            Funcionario::findOrFail($request->funcionario_id),
+            $request->user()->id,
+            $request->observacoes,
+        );
+    } catch (RuntimeException $e) {
+        return back()->withErrors(['equipamento_id' => $e->getMessage()]);
+    }
+
+    return redirect()->route('emprestimos.index')->with('success', 'Empréstimo registrado!');
+}
+```
+
+**As outras 3 actions (estrutura pronta):**
+
+`app/Actions/DevolverEmprestimoAction.php`:
+
+```php
+<?php
+
+namespace App\Actions;
+
+use App\Models\Emprestimo;
+use Illuminate\Support\Facades\DB;
+
+class DevolverEmprestimoAction
+{
+    public function execute(Emprestimo $emprestimo): void
+    {
+        DB::transaction(function () use ($emprestimo) {
+            $emprestimo->update([
+                'status' => 'devolvido',
+                'data_devolucao' => now(),
+            ]);
+
+            $emprestimo->equipamento->update(['status' => 'disponivel']);
+        });
+    }
+}
+```
+
+`app/Actions/AvaliarSolicitacaoAction.php` (junta o update + a notificação que já existe):
+
+```php
+<?php
+
+namespace App\Actions;
+
+use App\Models\Solicitacao;
+use App\Notifications\SolicitacaoStatusNotification;
+
+class AvaliarSolicitacaoAction
+{
+    public function execute(Solicitacao $solicitacao, string $status): void
+    {
+        $solicitacao->update(['status' => $status]);
+        $solicitacao->user->notify(new SolicitacaoStatusNotification($solicitacao));
+    }
+}
+```
+
+`app/Actions/InativarFuncionarioAction.php`:
+
+```php
+<?php
+
+namespace App\Actions;
+
+use App\Models\Funcionario;
+
+class InativarFuncionarioAction
+{
+    public function execute(Funcionario $funcionario): bool
+    {
+        $funcionario->update(['ativo' => ! $funcionario->ativo]);
+
+        return $funcionario->ativo;
+    }
+}
+```
+
+---
+
+### Passo 3 — Seeders + factories (dados de demonstração)
+
+**Comandos:**
+
+```bash
+docker compose exec app php artisan make:factory EquipamentoFactory --model=Equipamento
+docker compose exec app php artisan make:factory FuncionarioFactory --model=Funcionario
+docker compose exec app php artisan make:factory EmprestimoFactory --model=Emprestimo
+docker compose exec app php artisan make:factory SolicitacaoFactory --model=Solicitacao
+```
+
+**`database/factories/EquipamentoFactory.php`** (baseado na migration):
+
+```php
+public function definition(): array
+{
+    return [
+        'patrimonio_id' => fake()->unique()->numerify('PAT-####'),
+        'tipo' => fake()->randomElement(['tablet', 'notebook', 'desktop', 'monitor']),
+        'marca' => fake()->randomElement(['Dell', 'Lenovo', 'HP', 'Acer']),
+        'modelo' => fake()->bothify('??-####'),
+        'numero_serie' => fake()->unique()->bothify('SN-????-####'),
+        'processador' => fake()->randomElement(['Intel i5', 'Intel i7', 'AMD Ryzen 5']),
+        'memoria_ram' => fake()->randomElement(['8GB', '16GB', '32GB']),
+        'armazenamento' => fake()->randomElement(['256GB SSD', '512GB SSD', '1TB HDD']),
+        'sistema_operacional' => fake()->randomElement(['Windows 11', 'Linux Mint']),
+        'status' => 'disponivel',
+        'data_aquisicao' => fake()->date(),
+        'valor_aquisicao' => fake()->randomFloat(2, 1000, 8000),
+    ];
+}
+```
+
+**`database/factories/FuncionarioFactory.php`:**
+
+```php
+public function definition(): array
+{
+    return [
+        'nome' => fake()->name(),
+        'cpf' => fake()->unique()->numerify('###########'),
+        'email' => fake()->unique()->safeEmail(),
+        'telefone' => fake()->numerify('(##) #####-####'),
+        'setor' => fake()->randomElement(['TI', 'Administrativo', 'Compras', 'Campo']),
+        'cargo' => fake()->jobTitle(),
+        'endereco' => fake()->streetAddress(),
+        'cidade' => fake()->city(),
+        'uf' => fake()->stateAbbr(),
+        'tipo' => fake()->randomElement(['interno', 'prefeitura']),
+        'ativo' => true,
+    ];
+}
+```
+
+**`database/factories/EmprestimoFactory.php`** (usa as outras factories nas FKs):
+
+```php
+public function definition(): array
+{
+    return [
+        'equipamento_id' => Equipamento::factory(),
+        'funcionario_id' => Funcionario::factory(),
+        'admin_id' => User::factory(),
+        'data_saida' => now(),
+        'status' => 'ativo',
+        'observacoes' => fake()->sentence(),
+    ];
+}
+
+public function devolvido(): static
+{
+    return $this->state(fn () => [
+        'status' => 'devolvido',
+        'data_devolucao' => now(),
+    ]);
+}
+```
+
+**`database/factories/SolicitacaoFactory.php`:**
+
+```php
+public function definition(): array
+{
+    return [
+        'user_id' => User::factory(),
+        'tipo_equipamento' => fake()->randomElement(['Notebook', 'Desktop', 'Monitor', 'Tablet']),
+        'motivo' => fake()->sentence(6),
+        'urgencia' => fake()->randomElement(['baixa', 'media', 'alta']),
+        'status' => fake()->randomElement(['pendente', 'aprovada', 'recusada']),
+    ];
+}
+```
+
+**`database/seeders/DatabaseSeeder.php`** (substituir o conteúdo):
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Emprestimo;
+use App\Models\Equipamento;
+use App\Models\Funcionario;
+use App\Models\Solicitacao;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        User::factory()->create([
+            'name' => 'Administrador',
+            'email' => 'admin@admin.com',
+            'role' => 'admin',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Colaborador',
+            'email' => 'colaborador@colaborador.com',
+            'role' => 'user',
+        ]);
+
+        Funcionario::factory(20)->create();
+        Equipamento::factory(20)->create();
+
+        Emprestimo::factory(10)->devolvido()->create();
+        Emprestimo::factory(5)->create();
+
+        Solicitacao::factory(10)->create();
+    }
+}
+```
+
+**Rodar:**
+
+```bash
+docker compose exec app php artisan db:seed
+```
+
+> Atenção: o factory de `Emprestimo` **não** sincroniza o `status` do equipamento
+> (`em_uso`) como o fluxo real faz. Para dados 100% coerentes, no seeder você pode
+> atualizar os equipamentos dos empréstimos ativos:
+> `Emprestimo::where('status', 'ativo')->get()->each(fn ($e) => $e->equipamento->update(['status' => 'em_uso']));`
+
+---
+
+### Passo 4 — Paginação nas listagens
+
+Trocar `->get()` por `->paginate(15)` nos 5 pontos:
+
+| Controller | Linha atual | Trocar por |
+|---|---|---|
+| `EquipamentoController@index` | `$query->orderBy('tipo')->get()` | `$query->orderBy('tipo')->paginate(15)` |
+| `FuncionarioController@index` | `$query->orderBy('nome')->get()` | `$query->orderBy('nome')->paginate(15)` |
+| `EmprestimoController@index` | `$query->latest()->get()` | `$query->latest()->paginate(15)` |
+| `SolicitacaoController@index` | `...->latest()->get()` | `...->latest()->paginate(15)` |
+| `SolicitacaoController@adminIndex` | `...->latest()->get()` | `...->latest()->paginate(15)` |
+
+**⚠️ Mudança no front (obrigatória):** com `paginate()`, a prop do Inertia deixa
+de ser um array e vira um objeto paginador `{ data: [...], links: [...] }`.
+Cada página React precisa:
+1. Trocar `solicitacoes.map(...)` por `solicitacoes.data.map(...)` (idem para
+   equipamentos, funcionários, empréstimos);
+2. Renderizar a navegação com `solicitacoes.links` (o Inertia mantém `?page=N` na
+   URL, então clicar já recarrega a página certa).
+
+Exemplo mínimo no `Solicitacoes/Index.tsx`:
+
+```tsx
+import { router } from "@inertiajs/react";
+
+// no corpo da lista:
+{solicitacoes.data.map((s) => (/* linha como já existe */))}
+
+// rodapé da listagem:
+<div className="pagination">
+    {solicitacoes.links.map((link) => (
+        <button
+            key={link.label}
+            disabled={!link.url || link.active}
+            onClick={() => link.url && router.get(link.url)}
+        >
+            {link.label}
+        </button>
+    ))}
+</div>
+```
+
+Dica: crie um componente `Pagination.tsx` reutilizável (recebe `links`) e use nas
+4 páginas.
+
+---
+
+### Passo 5 — Testes automatizados com Pest
+
+O `pestphp/pest` já está no `composer.json` (require-dev). Falta inicializar:
+
+```bash
+docker compose exec app php artisan test --init
+```
+
+Isso cria `tests/Pest.php`, `tests/TestCase.php` e as pastas. O `phpunit.xml` já
+configura o teste com **SQLite em memória**, então não precisa de banco separado.
+
+**`tests/Feature/UserAccessTest.php`** (login e papéis):
+
+```php
+<?php
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('convidado é redirecionado para o login', function () {
+    $this->get('/dashboard')->assertRedirect('/login');
+});
+
+test('admin acessa o dashboard', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($admin)->get('/dashboard')->assertOk();
+});
+
+test('usuario comum não acessa o dashboard', function () {
+    $user = User::factory()->create(['role' => 'user']);
+
+    $this->actingAs($user)->get('/dashboard')->assertRedirect('/solicitacoes');
+});
+```
+
+**`tests/Feature/EquipamentoTest.php`** (CRUD):
+
+```php
+<?php
+
+use App\Models\Equipamento;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('admin cria equipamento', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($admin)->post('/equipamentos', [
+        'patrimonio_id' => 'PAT-001',
+        'tipo' => 'notebook',
+        'marca' => 'Dell',
+        'modelo' => 'Latitude 5420',
+    ])->assertRedirect('/equipamentos');
+
+    $this->assertDatabaseHas('equipamentos', ['patrimonio_id' => 'PAT-001']);
+});
+
+test('patrimonio duplicado é rejeitado', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    Equipamento::factory()->create(['patrimonio_id' => 'PAT-001']);
+
+    $this->actingAs($admin)->post('/equipamentos', [
+        'patrimonio_id' => 'PAT-001',
+        'tipo' => 'notebook',
+        'marca' => 'Dell',
+        'modelo' => 'Latitude',
+    ])->assertSessionHasErrors('patrimonio_id');
+});
+```
+
+**`tests/Feature/SolicitacaoTest.php`** (fluxo completo + notificação):
+
+```php
+<?php
+
+use App\Models\Solicitacao;
+use App\Models\User;
+use App\Notifications\SolicitacaoStatusNotification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+
+uses(RefreshDatabase::class);
+
+test('colaborador cria solicitacao', function () {
+    $user = User::factory()->create(['role' => 'user']);
+
+    $this->actingAs($user)->post('/solicitacoes', [
+        'tipo_equipamento' => 'Notebook',
+        'motivo' => 'Equipamento quebrado',
+        'urgencia' => 'alta',
+    ])->assertSessionHasNoErrors();
+
+    $this->assertDatabaseCount('solicitacoes', 1);
+});
+
+test('colaborador só vê as próprias solicitações', function () {
+    $user = User::factory()->create(['role' => 'user']);
+    Solicitacao::factory()->create(['user_id' => $user->id]);
+    Solicitacao::factory()->create(['user_id' => User::factory()->create()->id]);
+
+    $this->actingAs($user)->get('/solicitacoes')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('Solicitacoes/Index')
+            ->where('solicitacoes.total', 1));
+});
+
+test('admin avalia solicitacao e notifica o colaborador', function () {
+    Notification::fake();
+
+    $admin = User::factory()->create(['role' => 'admin']);
+    $user = User::factory()->create(['role' => 'user']);
+    $sol = Solicitacao::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($admin)->patch("/solicitacoes/{$sol->id}/avaliar", [
+        'status' => 'aprovada',
+    ])->assertSessionHasNoErrors();
+
+    $this->assertDatabaseHas('solicitacoes', ['id' => $sol->id, 'status' => 'aprovada']);
+    Notification::assertSentTo($user, SolicitacaoStatusNotification::class);
+});
+```
+
+> Para o `assertInertia`, é preciso instalar a extensão do Pest para Inertia:
+> `docker compose exec app composer require --dev clavada/pest-plugin-inertia` —
+> ou simplesmente remova esse assert e deixe o `assertOk()` se preferir simplicidade.
+
+**Rodar:**
+
+```bash
+docker compose exec app php artisan test
+```
+
+Quando os testes passarem, eles viram a rede de segurança para as próximas
+mudanças (ex.: refatorações de controller).
+
+---
+
+## Ordem sugerida de execução
+
+1. Passo 1 (Form Requests) — rápido e melhora a segurança (`validated()`).
+2. Passo 2 (Actions) — deixa os controllers finos.
+3. Passo 5 (Testes Pest) — **antes** de seeders/paginação, para garantir que
+   nada quebra depois.
+4. Passo 3 (Seeders/factories) — banco de demonstração.
+5. Passo 4 (Paginação) — por último, porque mexe no front também.
+
+---
+
+## Fora de escopo (evitar)
+
+Mantido do roadmap original — não vale o esforço para este projeto:
+
+- Microserviços ou divisão em múltiplos apps.
+- Fila dedicada / Redis / workers de produção.
+- Multitenancy.
+- Arquitetura modular tipo DDD (`Domains/`, `Modules/`) — o projeto tem poucos
+  módulos para justificar essa complexidade.
+- CI/CD elaborado (um deploy manual ou simples já é suficiente).

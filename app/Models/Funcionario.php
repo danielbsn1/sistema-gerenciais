@@ -11,7 +11,7 @@ class Funcionario extends Model
 
     protected $fillable = [
         'nome', 'cpf', 'email', 'telefone',
-        'setor', 'cargo', 'endereco', 'cidade', 'uf', 'tipo', 'ativo', 'inativo',
+        'setor', 'cargo', 'endereco', 'cidade', 'uf', 'tipo', 'ativo',
     ];
 
     public function emprestimos()

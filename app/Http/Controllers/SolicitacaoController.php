@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Solicitacao;
+use App\Notifications\SolicitacaoStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -38,6 +39,8 @@ class SolicitacaoController extends Controller
         ]);
 
         $solicitacao->update(['status' => $request->status]);
+
+        $solicitacao->user->notify(new SolicitacaoStatusNotification($solicitacao));
 
         return back()->with('success', 'Solicitação '.$request->status.' com sucesso!');
     }

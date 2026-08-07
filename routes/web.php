@@ -14,7 +14,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('dashboard');
     });
 
-    // Rotas para usuários comuns
+   
     Route::get('/solicitacoes', [SolicitacaoController::class, 'index'])->name('solicitacoes.index');
     Route::post('/solicitacoes', [SolicitacaoController::class, 'store'])->name('solicitacoes.store');
 });
