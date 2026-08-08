@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AvaliarSolicitacaoAction;
+use App\Http\Requests\AvaliarSolicitacaoRequest;
+use App\Http\Requests\StoreSolicitacaoRequest;
 use App\Models\Solicitacao;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -11,6 +13,10 @@ class SolicitacaoController extends Controller
 {
     public function index()
     {
+        if (Auth::user()?->role === 'admin') {
+            return redirect()->route('solicitacoes.admin');
+        }
+
         $solicitacoes = Solicitacao::where('user_id', Auth::id())
             ->latest()
             ->get();
@@ -31,31 +37,20 @@ class SolicitacaoController extends Controller
         ]);
     }
 
-    public function avaliar(Request $request, Solicitacao $solicitacao)
+    public function store(StoreSolicitacaoRequest $request)
     {
-        $request->validate([
-            'status' => 'required|in:aprovada,recusada',
-        ]);
-
-        $solicitacao->update(['status' => $request->status]);
-
-        return back()->with('success', 'Solicitação ' . $request->status . ' com sucesso!');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'tipo_equipamento' => 'required|string',
-            'motivo'           => 'required|string|max:255',
-            'urgencia'         => 'required|in:baixa,media,alta',
-            'observacoes'      => 'nullable|string',
-        ]);
-
         Solicitacao::create([
-            ...$request->only('tipo_equipamento', 'motivo', 'urgencia', 'observacoes'),
+            ...$request->validated(),
             'user_id' => Auth::id(),
         ]);
 
         return back()->with('success', 'Solicitação enviada com sucesso!');
+    }
+
+    public function avaliar(AvaliarSolicitacaoRequest $request, Solicitacao $solicitacao)
+    {
+        app(AvaliarSolicitacaoAction::class)->execute($solicitacao, $request->status);
+
+        return back()->with('success', 'Solicitação ' . $request->status . ' com sucesso!');
     }
 }

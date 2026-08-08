@@ -1,8 +1,27 @@
 import { FC, useState } from "react";
-import { useForm, usePage } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import "../../styles/form.css";
+import { useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardFooter } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../components/ui/select";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "../../components/ui/table";
+import StatusBadge from "../../components/StatusBadge";
+import { Field } from "../../components/Field";
 
 interface Solicitacao {
     id: number;
@@ -18,29 +37,14 @@ interface Props {
     solicitacoes: Solicitacao[];
 }
 
-const URGENCIA_LABEL: Record<string, string> = {
-    baixa: "Baixa",
-    media: "Média",
-    alta: "Alta",
-};
-
-const URGENCIA_CLASS: Record<string, string> = {
-    baixa: "badge--devolvido",
-    media: "badge--ativo",
-    alta: "badge--atrasado",
-};
-
-const STATUS_CLASS: Record<string, string> = {
-    pendente: "badge--ativo",
-    aprovada: "badge--devolvido",
-    recusada: "badge--atrasado",
-};
-
-const STATUS_LABEL: Record<string, string> = {
-    pendente: "Pendente",
-    aprovada: "Aprovada",
-    recusada: "Recusada",
-};
+const TIPOS = [
+    "Notebook",
+    "Desktop",
+    "Monitor",
+    "Tablet",
+    "Celular",
+    "Impressora",
+];
 
 const SolicitacoesIndex: FC<Props> = ({ solicitacoes = [] }) => {
     const [showForm, setShowForm] = useState(solicitacoes.length === 0);
@@ -64,272 +68,179 @@ const SolicitacoesIndex: FC<Props> = ({ solicitacoes = [] }) => {
 
     return (
         <AppLayout title="Solicitações">
-            <div className="page-form">
-                {/* Header */}
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 20,
-                    }}
-                >
-                    <div>
-                        <h2 style={{ fontSize: "1.25rem", fontWeight: 700 }}>
-                            Minhas Solicitações
-                        </h2>
-                        <p
-                            style={{
-                                fontSize: "0.875rem",
-                                color: "var(--text-muted)",
-                                marginTop: 2,
-                            }}
-                        >
-                            Solicite equipamentos e acompanhe o status
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Minhas Solicitações
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Solicite equipamentos e acompanhe o status
+                    </p>
+                </div>
+                {!showForm && (
+                    <Button onClick={() => setShowForm(true)}>
+                        + Nova Solicitação
+                    </Button>
+                )}
+            </div>
+
+            {showForm && (
+                <Card className="mx-auto max-w-3xl">
+                    <form onSubmit={handleSubmit}>
+                        <CardContent className="pt-6">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <Field
+                                    label="Tipo de Equipamento"
+                                    required
+                                    error={errors.tipo_equipamento}
+                                >
+                                    <Select
+                                        value={data.tipo_equipamento || null}
+                                        onValueChange={(value) =>
+                                            setData("tipo_equipamento", value ?? "")
+                                        }
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Selecione..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {TIPOS.map((t) => (
+                                                <SelectItem key={t} value={t}>
+                                                    {t}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+
+                                <Field
+                                    label="Urgência"
+                                    required
+                                    error={errors.urgencia}
+                                >
+                                    <Select
+                                        value={data.urgencia || null}
+                                        onValueChange={(value) =>
+                                            setData("urgencia", value ?? "media")
+                                        }
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="baixa">Baixa</SelectItem>
+                                            <SelectItem value="media">Média</SelectItem>
+                                            <SelectItem value="alta">Alta</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+
+                                <Field
+                                    label="Motivo"
+                                    required
+                                    error={errors.motivo}
+                                    className="sm:col-span-2"
+                                >
+                                    <Input
+                                        placeholder="Ex: Equipamento atual com defeito, novo colaborador..."
+                                        value={data.motivo}
+                                        onChange={(e) =>
+                                            setData("motivo", e.target.value)
+                                        }
+                                        aria-invalid={!!errors.motivo}
+                                    />
+                                </Field>
+
+                                <Field
+                                    label="Observações"
+                                    className="sm:col-span-2"
+                                >
+                                    <Textarea
+                                        placeholder="Informações adicionais, especificações, etc..."
+                                        value={data.observacoes}
+                                        onChange={(e) =>
+                                            setData("observacoes", e.target.value)
+                                        }
+                                    />
+                                </Field>
+                            </div>
+                        </CardContent>
+
+                        <CardFooter className="justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={() => {
+                                    reset();
+                                    setShowForm(false);
+                                }}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                {processing ? "Enviando..." : "Enviar Solicitação"}
+                            </Button>
+                        </CardFooter>
+                    </form>
+                </Card>
+            )}
+
+            {solicitacoes.length > 0 ? (
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <tr>
+                                    <TableHead>Equipamento</TableHead>
+                                    <TableHead>Motivo</TableHead>
+                                    <TableHead>Urgência</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Data</TableHead>
+                                </tr>
+                            </TableHeader>
+                            <TableBody>
+                                {solicitacoes.map((s) => (
+                                    <TableRow key={s.id}>
+                                        <TableCell className="font-medium">
+                                            {s.tipo_equipamento}
+                                        </TableCell>
+                                        <TableCell className="max-w-60 truncate text-muted-foreground">
+                                            {s.motivo}
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={s.urgencia} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={s.status} />
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {new Date(
+                                                s.created_at,
+                                            ).toLocaleDateString("pt-BR")}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            ) : (
+                !showForm && (
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-16 text-center">
+                        <span className="text-3xl">📋</span>
+                        <p className="text-sm text-muted-foreground">
+                            Nenhuma solicitação ainda.
                         </p>
-                    </div>
-                    {!showForm && (
                         <Button
-                            variant="primary"
+                            variant="outline"
                             size="sm"
                             onClick={() => setShowForm(true)}
                         >
-                            + Nova Solicitação
+                            Criar a primeira
                         </Button>
-                    )}
-                </div>
-
-                {/* Formulário */}
-                {showForm && (
-                    <div className="form-card" style={{ marginBottom: 24 }}>
-                        <div className="form-card__header">
-                            <h3 className="form-card__title">
-                                Nova Solicitação
-                            </h3>
-                            <p className="form-card__subtitle">
-                                Preencha os dados do equipamento que precisa
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-card__body">
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label className="form-label form-label--required">
-                                            Tipo de Equipamento
-                                        </label>
-                                        <select
-                                            className={`form-select ${errors.tipo_equipamento ? "is-error" : ""}`}
-                                            value={data.tipo_equipamento}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "tipo_equipamento",
-                                                    e.target.value,
-                                                )
-                                            }
-                                        >
-                                            <option value="">
-                                                Selecione...
-                                            </option>
-                                            <option value="Notebook">
-                                                Notebook
-                                            </option>
-                                            <option value="Desktop">
-                                                Desktop
-                                            </option>
-                                            <option value="Monitor">
-                                                Monitor
-                                            </option>
-                                            <option value="Tablet">
-                                                Tablet
-                                            </option>
-                                            <option value="Celular">
-                                                Celular
-                                            </option>
-                                            <option value="Impressora">
-                                                Impressora
-                                            </option>
-                                        </select>
-                                        {errors.tipo_equipamento && (
-                                            <span className="form-error">
-                                                {errors.tipo_equipamento}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label className="form-label form-label--required">
-                                            Urgência
-                                        </label>
-                                        <select
-                                            className={`form-select ${errors.urgencia ? "is-error" : ""}`}
-                                            value={data.urgencia}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "urgencia",
-                                                    e.target.value,
-                                                )
-                                            }
-                                        >
-                                            <option value="baixa">
-                                                🟢 Baixa
-                                            </option>
-                                            <option value="media">
-                                                🟡 Média
-                                            </option>
-                                            <option value="alta">
-                                                🔴 Alta
-                                            </option>
-                                        </select>
-                                        {errors.urgencia && (
-                                            <span className="form-error">
-                                                {errors.urgencia}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <div className="form-group form-group--full">
-                                        <label className="form-label form-label--required">
-                                            Motivo
-                                        </label>
-                                        <input
-                                            className={`form-input ${errors.motivo ? "is-error" : ""}`}
-                                            placeholder="Ex: Equipamento atual com defeito, novo colaborador..."
-                                            value={data.motivo}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "motivo",
-                                                    e.target.value,
-                                                )
-                                            }
-                                        />
-                                        {errors.motivo && (
-                                            <span className="form-error">
-                                                {errors.motivo}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <div className="form-group form-group--full">
-                                        <label className="form-label">
-                                            Observações
-                                        </label>
-                                        <textarea
-                                            className="form-textarea"
-                                            placeholder="Informações adicionais, especificações, etc..."
-                                            value={data.observacoes}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "observacoes",
-                                                    e.target.value,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-card__footer">
-                                <Button
-                                    variant="secondary"
-                                    type="button"
-                                    onClick={() => {
-                                        reset();
-                                        setShowForm(false);
-                                    }}
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    variant="primary"
-                                    type="submit"
-                                    disabled={processing}
-                                >
-                                    {processing
-                                        ? "Enviando..."
-                                        : "Enviar Solicitação"}
-                                </Button>
-                            </div>
-                        </form>
                     </div>
-                )}
-
-                {/* Lista de solicitações */}
-                {solicitacoes.length > 0 && (
-                    <div className="card">
-                        <div className="card__header">
-                            <span className="list-header__count">
-                                {solicitacoes.length} solicitação(ões)
-                            </span>
-                        </div>
-                        <div className="table-wrapper">
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>Equipamento</th>
-                                        <th>Motivo</th>
-                                        <th>Urgência</th>
-                                        <th>Status</th>
-                                        <th>Data</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {solicitacoes.map((s) => (
-                                        <tr key={s.id}>
-                                            <td>{s.tipo_equipamento}</td>
-                                            <td
-                                                style={{
-                                                    maxWidth: 260,
-                                                    color: "var(--text-secondary)",
-                                                }}
-                                            >
-                                                {s.motivo}
-                                            </td>
-                                            <td>
-                                                <span
-                                                    className={`badge ${URGENCIA_CLASS[s.urgencia]}`}
-                                                >
-                                                    {URGENCIA_LABEL[s.urgencia]}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span
-                                                    className={`badge ${STATUS_CLASS[s.status]}`}
-                                                >
-                                                    {STATUS_LABEL[s.status]}
-                                                </span>
-                                            </td>
-                                            <td
-                                                style={{
-                                                    color: "var(--text-muted)",
-                                                    fontSize: "0.85rem",
-                                                }}
-                                            >
-                                                {new Date(
-                                                    s.created_at,
-                                                ).toLocaleDateString("pt-BR")}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* Empty state */}
-                {solicitacoes.length === 0 && !showForm && (
-                    <div
-                        className="card"
-                        style={{ textAlign: "center", padding: "48px 20px" }}
-                    >
-                        <p style={{ fontSize: "2rem", marginBottom: 8 }}>📋</p>
-                        <p style={{ color: "var(--text-muted)" }}>
-                            Nenhuma solicitação ainda.
-                        </p>
-                    </div>
-                )}
-            </div>
+                )
+            )}
         </AppLayout>
     );
 };

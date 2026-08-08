@@ -1,6 +1,15 @@
 import { Link, useForm } from "@inertiajs/react";
-import "../../styles/auth.css";
-import "../../styles/form.css";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/Field";
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -14,62 +23,57 @@ export default function Login() {
     }
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <h1 className="auth-logo">
-                        Sistema<span>Gerenciais</span>
-                    </h1>
-                    <p className="auth-subtitle">Faça login para continuar</p>
-                </div>
+        <div className="flex min-h-svh items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-sm">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-xl">
+                        Sistema<span className="text-primary">Gerenciais</span>
+                    </CardTitle>
+                    <CardDescription>
+                        Faça login para continuar
+                    </CardDescription>
+                </CardHeader>
 
-                <form onSubmit={submit} className="auth-form">
-                    <div className="form-group">
-                        <label className="form-label">E-mail</label>
-                        <input
-                            type="email"
-                            className={`form-input ${errors.email ? "is-error" : ""}`}
-                            placeholder="seu@email.com"
-                            value={data.email}
-                            onChange={(e) => setData("email", e.target.value)}
-                        />
-                        {errors.email && (
-                            <span className="form-error">{errors.email}</span>
-                        )}
-                    </div>
+                <CardContent>
+                    <form onSubmit={submit} className="grid gap-4">
+                        <Field label="E-mail" required error={errors.email}>
+                            <Input
+                                type="email"
+                                placeholder="seu@email.com"
+                                value={data.email}
+                                onChange={(e) => setData("email", e.target.value)}
+                                aria-invalid={!!errors.email}
+                            />
+                        </Field>
 
-                    <div className="form-group">
-                        <label className="form-label">Senha</label>
-                        <input
-                            type="password"
-                            className={`form-input ${errors.password ? "is-error" : ""}`}
-                            placeholder="••••••••"
-                            value={data.password}
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                        />
-                        {errors.password && (
-                            <span className="form-error">
-                                {errors.password}
-                            </span>
-                        )}
-                    </div>
+                        <Field label="Senha" required error={errors.password}>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
+                                aria-invalid={!!errors.password}
+                            />
+                        </Field>
 
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="btn btn--primary"
-                        style={{ marginTop: 8 }}
+                        <Button type="submit" disabled={processing} className="mt-2 w-full">
+                            {processing ? "Entrando..." : "Entrar"}
+                        </Button>
+                    </form>
+                </CardContent>
+
+                <CardFooter className="justify-center text-sm text-muted-foreground">
+                    Não tem conta?{" "}
+                    <Link
+                        href="/register"
+                        className="ml-1 font-medium text-primary hover:underline"
                     >
-                        {processing ? "Entrando..." : "Entrar"}
-                    </button>
-                </form>
-
-                <p className="auth-footer">
-                    Não tem conta? <Link href="/register">Criar conta</Link>
-                </p>
-            </div>
+                        Criar conta
+                    </Link>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

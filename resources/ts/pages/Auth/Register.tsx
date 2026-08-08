@@ -1,6 +1,15 @@
 import { Link, useForm } from "@inertiajs/react";
-import "../../styles/auth.css";
-import "../../styles/form.css";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/Field";
 
 export default function Register() {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,89 +25,84 @@ export default function Register() {
     }
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <h1 className="auth-logo">Sistema Gerenciais</h1>
-                    <p className="auth-subtitle">
+        <div className="flex min-h-svh items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-sm">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-xl">Sistema Gerenciais</CardTitle>
+                    <CardDescription>
                         Crie sua conta para solicitar equipamentos
-                    </p>
-                </div>
+                    </CardDescription>
+                </CardHeader>
 
-                <form onSubmit={submit} className="auth-form">
-                    <div className="form-group">
-                        <label className="form-label">Nome completo</label>
-                        <input
-                            type="text"
-                            className={`form-input ${errors.name ? "is-error" : ""}`}
-                            placeholder="Seu nome"
-                            value={data.name}
-                            onChange={(e) => setData("name", e.target.value)}
-                        />
-                        {errors.name && (
-                            <span className="form-error">{errors.name}</span>
-                        )}
-                    </div>
+                <CardContent>
+                    <form onSubmit={submit} className="grid gap-4">
+                        <Field label="Nome completo" required error={errors.name}>
+                            <Input
+                                type="text"
+                                placeholder="Seu nome"
+                                value={data.name}
+                                onChange={(e) => setData("name", e.target.value)}
+                                aria-invalid={!!errors.name}
+                            />
+                        </Field>
 
-                    <div className="form-group">
-                        <label className="form-label">E-mail</label>
-                        <input
-                            type="email"
-                            className={`form-input ${errors.email ? "is-error" : ""}`}
-                            placeholder="seu@email.com"
-                            value={data.email}
-                            onChange={(e) => setData("email", e.target.value)}
-                        />
-                        {errors.email && (
-                            <span className="form-error">{errors.email}</span>
-                        )}
-                    </div>
+                        <Field label="E-mail" required error={errors.email}>
+                            <Input
+                                type="email"
+                                placeholder="seu@email.com"
+                                value={data.email}
+                                onChange={(e) => setData("email", e.target.value)}
+                                aria-invalid={!!errors.email}
+                            />
+                        </Field>
 
-                    <div className="form-group">
-                        <label className="form-label">Senha</label>
-                        <input
-                            type="password"
-                            className={`form-input ${errors.password ? "is-error" : ""}`}
-                            placeholder="••••••••"
-                            value={data.password}
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                        />
-                        {errors.password && (
-                            <span className="form-error">
-                                {errors.password}
-                            </span>
-                        )}
-                    </div>
+                        <Field label="Senha" required error={errors.password}>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
+                                aria-invalid={!!errors.password}
+                            />
+                        </Field>
 
-                    <div className="form-group">
-                        <label className="form-label">Confirmar senha</label>
-                        <input
-                            type="password"
-                            className="form-input"
-                            placeholder="••••••••"
-                            value={data.password_confirmation}
-                            onChange={(e) =>
-                                setData("password_confirmation", e.target.value)
-                            }
-                        />
-                    </div>
+                        <Field
+                            label="Confirmar senha"
+                            required
+                            error={errors.password_confirmation}
+                        >
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={data.password_confirmation}
+                                onChange={(e) =>
+                                    setData(
+                                        "password_confirmation",
+                                        e.target.value,
+                                    )
+                                }
+                                aria-invalid={!!errors.password_confirmation}
+                            />
+                        </Field>
 
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="btn btn--primary"
-                        style={{ marginTop: 8 }}
+                        <Button type="submit" disabled={processing} className="mt-2 w-full">
+                            {processing ? "Criando conta..." : "Criar conta"}
+                        </Button>
+                    </form>
+                </CardContent>
+
+                <CardFooter className="justify-center text-sm text-muted-foreground">
+                    Já tem conta?{" "}
+                    <Link
+                        href="/login"
+                        className="ml-1 font-medium text-primary hover:underline"
                     >
-                        {processing ? "Criando conta..." : "Criar conta"}
-                    </button>
-                </form>
-
-                <p className="auth-footer">
-                    Já tem conta? <Link href="/login">Fazer login</Link>
-                </p>
-            </div>
+                        Fazer login
+                    </Link>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

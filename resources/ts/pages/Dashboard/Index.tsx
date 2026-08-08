@@ -1,7 +1,11 @@
 import AppLayout from "../../components/layout/AppLayout";
 import StatCard from "../../components/cards/StatCard";
-import { FaUsers, FaBox, FaTools, FaCheckCircle } from "react-icons/fa";
-import "../../styles/dashboard.css";
+import {
+    Users,
+    Package,
+    Wrench,
+    CheckCircle2,
+} from "lucide-react";
 import { ChartPieInteractive } from "./chartds";
 
 interface Props {
@@ -21,40 +25,46 @@ export default function Dashboard({
 }: Props) {
     return (
         <AppLayout>
-            <div className="dashboard-header">
-                <h1>Dashboard</h1>
-                <p>Visão geral do sistema</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Dashboard
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Visão geral do sistema
+                    </p>
+                </div>
             </div>
 
-            <div className="stats-grid">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 <StatCard
                     title="Total"
                     value={totalEquipamentos}
-                    icon={<FaBox />}
+                    icon={<Package className="size-5" />}
                 />
-
                 <StatCard
                     title="Disponíveis"
                     value={disponiveis}
-                    icon={<FaCheckCircle />}
+                    icon={<CheckCircle2 className="size-5" />}
                 />
-
-                <StatCard title="Em Uso" value={emUso} icon={<FaUsers />} />
-
+                <StatCard
+                    title="Em Uso"
+                    value={emUso}
+                    icon={<Users className="size-5" />}
+                />
                 <StatCard
                     title="Manutenção"
                     value={manutencao}
-                    icon={<FaTools />}
+                    icon={<Wrench className="size-5" />}
                 />
-
                 <StatCard
                     title="Funcionários"
                     value={funcionarios}
-                    icon={<FaUsers />}
+                    icon={<Users className="size-5" />}
                 />
-
-                <ChartPieInteractive />
             </div>
+
+            <ChartPieInteractive />
         </AppLayout>
     );
 }

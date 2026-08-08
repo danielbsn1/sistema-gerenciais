@@ -29,43 +29,32 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-export const description = "Grafico de Equipamentos"
-
-const desktopData = [
-    { month: "CPU", desktop: 186, fill: "var(--color-cpu)" },
-    { month: "Monitor", desktop: 305, fill: "var(--color-monitor)" },
-    { month: "Notebook", desktop: 237, fill: "var(--color-notebook)" },
-    { month: "Impressora", desktop: 173, fill: "var(--color-impressora)" },
-    { month: "Tablet", desktop: 209, fill: "var(--color-tablet)" },
+const equipmentData = [
+    { tipo: "CPU", valor: 186, fill: "var(--color-cpu)" },
+    { tipo: "Monitor", valor: 305, fill: "var(--color-monitor)" },
+    { tipo: "Notebook", valor: 237, fill: "var(--color-notebook)" },
+    { tipo: "Impressora", valor: 173, fill: "var(--color-impressora)" },
+    { tipo: "Tablet", valor: 209, fill: "var(--color-tablet)" },
 ]
 
 const chartConfig = {
-    visitors: {
-        label: "Visitors",
-    },
-    desktop: {
-        label: "Desktop",
-    },
-    mobile: {
-        label: "Mobile",
-    },
-    january: {
+    cpu: {
         label: "CPU",
         color: "var(--chart-1)",
     },
-    february: {
+    monitor: {
         label: "Monitor",
         color: "var(--chart-2)",
     },
-    march: {
+    notebook: {
         label: "Notebook",
         color: "var(--chart-3)",
     },
-    april: {
+    impressora: {
         label: "Impressora",
         color: "var(--chart-4)",
     },
-    may: {
+    tablet: {
         label: "Tablet",
         color: "var(--chart-5)",
     },
@@ -73,13 +62,13 @@ const chartConfig = {
 
 export function ChartPieInteractive() {
     const id = "pie-interactive"
-    const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month)
+    const [activeTipo, setActiveTipo] = React.useState(equipmentData[0].tipo)
 
     const activeIndex = React.useMemo(
-        () => desktopData.findIndex((item) => item.month === activeMonth),
-        [activeMonth]
+        () => equipmentData.findIndex((item) => item.tipo === activeTipo),
+        [activeTipo]
     )
-    const months = React.useMemo(() => desktopData.map((item) => item.month), [])
+    const tipos = React.useMemo(() => equipmentData.map((item) => item.tipo), [])
 
     const renderPieShape = React.useCallback(
         ({ index, outerRadius = 0, ...props }: PieSectorShapeProps) => {
@@ -106,19 +95,19 @@ export function ChartPieInteractive() {
             <ChartStyle id={id} config={chartConfig} />
             <CardHeader className="flex-row items-start space-y-0 pb-0">
                 <div className="grid gap-1">
-                    <CardTitle>Pie Chart - Interactive</CardTitle>
-                    <CardDescription>January - June 2024</CardDescription>
+                    <CardTitle>Equipamentos por tipo</CardTitle>
+                    <CardDescription>Distribuição do inventário</CardDescription>
                 </div>
-                <Select value={activeMonth} onValueChange={(value) => value && setActiveMonth(value)}>
+                <Select value={activeTipo} onValueChange={(value) => value && setActiveTipo(value)}>
                     <SelectTrigger
                         className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
-                        aria-label="Select a value"
+                        aria-label="Selecionar tipo"
                     >
-                        <SelectValue placeholder="Select month" />
+                        <SelectValue placeholder="Selecionar tipo" />
                     </SelectTrigger>
                     <SelectContent align="end" className="rounded-xl">
-                        {months.map((key) => {
-                            const config = chartConfig[key as keyof typeof chartConfig]
+                        {tipos.map((key) => {
+                            const config = chartConfig[key.toLowerCase() as keyof typeof chartConfig]
 
                             if (!config) {
                                 return null
@@ -134,7 +123,7 @@ export function ChartPieInteractive() {
                                         <span
                                             className="flex h-3 w-3 shrink-0 rounded-xs"
                                             style={{
-                                                backgroundColor: `var(--color-${key})`,
+                                                backgroundColor: `var(--color-${key.toLowerCase()})`,
                                             }}
                                         />
                                         {config?.label}
@@ -157,9 +146,9 @@ export function ChartPieInteractive() {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Pie
-                            data={desktopData}
-                            dataKey="desktop"
-                            nameKey="month"
+                            data={equipmentData}
+                            dataKey="valor"
+                            nameKey="tipo"
                             innerRadius={60}
                             strokeWidth={5}
                             shape={renderPieShape}
@@ -179,14 +168,14 @@ export function ChartPieInteractive() {
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    {desktopData[activeIndex].desktop.toLocaleString()}
+                                                    {equipmentData[activeIndex].valor.toLocaleString("pt-BR")}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
                                                     className="fill-muted-foreground"
                                                 >
-                                                    Visitors
+                                                    Equipamentos
                                                 </tspan>
                                             </text>
                                         )

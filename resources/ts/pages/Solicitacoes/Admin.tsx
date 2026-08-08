@@ -1,8 +1,17 @@
 import { FC } from "react";
 import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import "../../styles/equipamentos.css";
-import "../../styles/showeq.css";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "../../components/ui/table";
+import StatusBadge from "../../components/StatusBadge";
 
 interface Solicitacao {
     id: number;
@@ -19,166 +28,161 @@ interface Props {
     solicitacoes: Solicitacao[];
 }
 
-const URGENCIA_CLASS: Record<string, string> = {
-    baixa: "badge--devolvido",
-    media: "badge--ativo",
-    alta:  "badge--atrasado",
-};
-
-const URGENCIA_LABEL: Record<string, string> = {
-    baixa: "Baixa",
-    media: "Média",
-    alta:  "Alta",
-};
-
-const STATUS_CLASS: Record<string, string> = {
-    pendente:  "badge--ativo",
-    aprovada:  "badge--devolvido",
-    recusada:  "badge--atrasado",
-};
-
-const STATUS_LABEL: Record<string, string> = {
-    pendente: "Pendente",
-    aprovada: "Aprovada",
-    recusada: "Recusada",
-};
-
 const SolicitacoesAdmin: FC<Props> = ({ solicitacoes = [] }) => {
-
     const handleAvaliar = (id: number, status: "aprovada" | "recusada") => {
         const acao = status === "aprovada" ? "aprovar" : "recusar";
         if (confirm(`Deseja ${acao} esta solicitação?`)) {
-            router.patch(`/solicitacoes/${id}/avaliar`, { status }, { preserveScroll: true });
+            router.patch(
+                `/solicitacoes/${id}/avaliar`,
+                { status },
+                { preserveScroll: true },
+            );
         }
     };
 
-    const pendentes  = solicitacoes.filter((s) => s.status === "pendente");
-    const avaliadas  = solicitacoes.filter((s) => s.status !== "pendente");
+    const pendentes = solicitacoes.filter((s) => s.status === "pendente");
+    const avaliadas = solicitacoes.filter((s) => s.status !== "pendente");
 
     return (
         <AppLayout title="Solicitações">
+            <div>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                    Solicitações
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                    Analise e responda as solicitações de equipamentos
+                </p>
+            </div>
 
-            {/* Pendentes */}
-            <div className="card" style={{ marginBottom: 20 }}>
-                <div className="card__header">
-                    <span className="list-header__count">
-                        {pendentes.length} pendente(s)
-                    </span>
-                </div>
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+            <Card>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>Solicitante</th>
-                                <th>Equipamento</th>
-                                <th>Motivo</th>
-                                <th>Urgência</th>
-                                <th>Data</th>
-                                <th>Ações</th>
+                                <TableHead>Solicitante</TableHead>
+                                <TableHead>Equipamento</TableHead>
+                                <TableHead>Motivo</TableHead>
+                                <TableHead>Urgência</TableHead>
+                                <TableHead>Data</TableHead>
+                                <TableHead className="text-right">Ações</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {pendentes.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhuma solicitação pendente.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 pendentes.map((s) => (
-                                    <tr key={s.id}>
-                                        <td>
-                                            {s.user.name}
-                                            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                                    <TableRow key={s.id}>
+                                        <TableCell>
+                                            <span className="font-medium">
+                                                {s.user.name}
+                                            </span>
+                                            <div className="text-xs text-muted-foreground">
                                                 {s.user.email}
                                             </div>
-                                        </td>
-                                        <td>{s.tipo_equipamento}</td>
-                                        <td style={{ maxWidth: 220, color: "var(--text-secondary)" }}>
-                                            {s.motivo}
+                                        </TableCell>
+                                        <TableCell>{s.tipo_equipamento}</TableCell>
+                                        <TableCell className="max-w-60">
+                                            <span className="text-muted-foreground">
+                                                {s.motivo}
+                                            </span>
                                             {s.observacoes && (
-                                                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
+                                                <div className="text-xs text-muted-foreground">
                                                     {s.observacoes}
                                                 </div>
                                             )}
-                                        </td>
-                                        <td>
-                                            <span className={`badge ${URGENCIA_CLASS[s.urgencia]}`}>
-                                                {URGENCIA_LABEL[s.urgencia]}
-                                            </span>
-                                        </td>
-                                        <td style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-                                            {new Date(s.created_at).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td>
-                                            <div className="table__actions">
-                                                <button
-                                                    className="btn btn--link"
-                                                    onClick={() => handleAvaliar(s.id, "aprovada")}
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={s.urgencia} />
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {new Date(
+                                                s.created_at,
+                                            ).toLocaleDateString("pt-BR")}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    variant="link"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        handleAvaliar(s.id, "aprovada")
+                                                    }
                                                 >
                                                     Aprovar
-                                                </button>
-                                                <button
-                                                    className="btn btn--link-danger"
-                                                    onClick={() => handleAvaliar(s.id, "recusada")}
+                                                </Button>
+                                                <Button
+                                                    variant="link"
+                                                    size="sm"
+                                                    className="text-destructive hover:text-destructive"
+                                                    onClick={() =>
+                                                        handleAvaliar(s.id, "recusada")
+                                                    }
                                                 >
                                                     Recusar
-                                                </button>
+                                                </Button>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
 
-            {/* Avaliadas */}
             {avaliadas.length > 0 && (
-                <div className="card">
-                    <div className="card__header">
-                        <span className="list-header__count">Histórico — {avaliadas.length} avaliada(s)</span>
-                    </div>
-                    <div className="table-wrapper">
-                        <table className="table">
-                            <thead>
+                <Card>
+                    <CardContent className="p-0">
+                        <div className="flex items-center justify-between px-4 pt-4">
+                            <span className="text-sm font-medium text-muted-foreground">
+                                Histórico — {avaliadas.length} avaliada(s)
+                            </span>
+                        </div>
+                        <Table>
+                            <TableHeader>
                                 <tr>
-                                    <th>Solicitante</th>
-                                    <th>Equipamento</th>
-                                    <th>Motivo</th>
-                                    <th>Urgência</th>
-                                    <th>Status</th>
-                                    <th>Data</th>
+                                    <TableHead>Solicitante</TableHead>
+                                    <TableHead>Equipamento</TableHead>
+                                    <TableHead>Motivo</TableHead>
+                                    <TableHead>Urgência</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Data</TableHead>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            </TableHeader>
+                            <TableBody>
                                 {avaliadas.map((s) => (
-                                    <tr key={s.id}>
-                                        <td>{s.user.name}</td>
-                                        <td>{s.tipo_equipamento}</td>
-                                        <td style={{ maxWidth: 220, color: "var(--text-secondary)" }}>{s.motivo}</td>
-                                        <td>
-                                            <span className={`badge ${URGENCIA_CLASS[s.urgencia]}`}>
-                                                {URGENCIA_LABEL[s.urgencia]}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span className={`badge ${STATUS_CLASS[s.status]}`}>
-                                                {STATUS_LABEL[s.status]}
-                                            </span>
-                                        </td>
-                                        <td style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-                                            {new Date(s.created_at).toLocaleDateString("pt-BR")}
-                                        </td>
-                                    </tr>
+                                    <TableRow key={s.id}>
+                                        <TableCell>{s.user.name}</TableCell>
+                                        <TableCell>{s.tipo_equipamento}</TableCell>
+                                        <TableCell className="max-w-60 text-muted-foreground">
+                                            {s.motivo}
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={s.urgencia} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={s.status} />
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {new Date(
+                                                s.created_at,
+                                            ).toLocaleDateString("pt-BR")}
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             )}
-
         </AppLayout>
     );
 };

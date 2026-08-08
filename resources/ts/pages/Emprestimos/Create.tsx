@@ -2,8 +2,20 @@ import { FC } from "react";
 import { Link, useForm } from "@inertiajs/react";
 import AppLayout from "../../components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import "../../styles/form.css";
-import "../../styles/emprestimo.css";
+import {
+    Card,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Field } from "@/components/Field";
 
 interface Equipamento {
     id: number;
@@ -39,89 +51,101 @@ const EmprestimosCreate: FC<Props> = ({
 
     return (
         <AppLayout title="Novo Empréstimo">
-            <div className="page-form">
-                <div className="form-card">
-                    <div className="form-card__header">
-                        <h2 className="form-card__title">Novo Empréstimo</h2>
-                        <p className="form-card__subtitle">
-                            Vincule um equipamento a um funcionário
-                        </p>
-                    </div>
-
-                    <form onSubmit={submit} id="emprestimo-form" className="emprestimo-form">
-                        <div className="form-card__body">
-                            <div className="form-grid">
-                                <div className="form-group form-group--full">
-                                    <label className="form-label form-label--required">
-                                        Equipamento
-                                    </label>
-                                    <select
-                                        className={`form-select ${errors.equipamento_id ? "is-error" : ""}`}
-                                        value={data.equipamento_id}
-                                        onChange={(e) =>
-                                            setData("equipamento_id", e.target.value)
-                                        }
-                                    >
-                                        <option value="">Selecione um equipamento</option>
-                                        {equipamentos.map((eq) => (
-                                            <option key={eq.id} value={eq.id}>
-                                                {eq.marca} {eq.modelo} — {eq.patrimonio_id}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.equipamento_id && (
-                                        <span className="form-error">{errors.equipamento_id}</span>
-                                    )}
-                                </div>
-
-                                <div className="form-group form-group--full">
-                                    <label className="form-label form-label--required">
-                                        Funcionário
-                                    </label>
-                                    <select
-                                        className={`form-select ${errors.funcionario_id ? "is-error" : ""}`}
-                                        value={data.funcionario_id}
-                                        onChange={(e) =>
-                                            setData("funcionario_id", e.target.value)
-                                        }
-                                    >
-                                        <option value="">Selecione um funcionário</option>
-                                        {funcionarios.map((func) => (
-                                            <option key={func.id} value={func.id}>
-                                                {func.nome}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.funcionario_id && (
-                                        <span className="form-error">{errors.funcionario_id}</span>
-                                    )}
-                                </div>
-
-                                <div className="form-group form-group--full">
-                                    <label className="form-label">Observações</label>
-                                    <textarea
-                                        className="form-textarea"
-                                        placeholder="Informações adicionais sobre o empréstimo..."
-                                        value={data.observacoes}
-                                        onChange={(e) =>
-                                            setData("observacoes", e.target.value)
-                                        }
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="form-card__footer">
-                            <Button render={<Link href="/emprestimos" />} variant="outline">
-                                Cancelar
-                            </Button>
-                            <Button type="submit" disabled={processing}>
-                                {processing ? "Salvando..." : "Registrar Empréstimo"}
-                            </Button>
-                        </div>
-                    </form>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Novo Empréstimo
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Vincule um equipamento a um funcionário
+                    </p>
                 </div>
+                <Button render={<Link href="/emprestimos" />} variant="outline">
+                    Voltar
+                </Button>
             </div>
+
+            <Card className="mx-auto max-w-3xl">
+                <form onSubmit={submit} id="emprestimo-form">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 gap-4">
+                            <Field
+                                label="Equipamento"
+                                required
+                                error={errors.equipamento_id}
+                            >
+                                <Select
+                                    value={data.equipamento_id || null}
+                                    onValueChange={(value) =>
+                                        setData("equipamento_id", value ?? "")
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Selecione um equipamento" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {equipamentos.map((eq) => (
+                                            <SelectItem
+                                                key={eq.id}
+                                                value={String(eq.id)}
+                                            >
+                                                {eq.marca} {eq.modelo} —{" "}
+                                                {eq.patrimonio_id}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+
+                            <Field
+                                label="Funcionário"
+                                required
+                                error={errors.funcionario_id}
+                            >
+                                <Select
+                                    value={data.funcionario_id || null}
+                                    onValueChange={(value) =>
+                                        setData("funcionario_id", value ?? "")
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Selecione um funcionário" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {funcionarios.map((func) => (
+                                            <SelectItem
+                                                key={func.id}
+                                                value={String(func.id)}
+                                            >
+                                                {func.nome}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+
+                            <Field label="Observações">
+                                <Textarea
+                                    placeholder="Informações adicionais sobre o empréstimo..."
+                                    value={data.observacoes}
+                                    onChange={(e) =>
+                                        setData("observacoes", e.target.value)
+                                    }
+                                />
+                            </Field>
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className="justify-end gap-2">
+                        <Button render={<Link href="/emprestimos" />} variant="outline">
+                            Cancelar
+                        </Button>
+                        <Button type="submit" form="emprestimo-form" disabled={processing}>
+                            {processing ? "Salvando..." : "Registrar Empréstimo"}
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
         </AppLayout>
     );
 };

@@ -1,24 +1,26 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Topbar from "./Topbar";
-import "../../styles/layout.css";
+import FlashToasts from "./FlashToasts";
 
 type Props = {
     title?: string;
     children: React.ReactNode;
 };
 
-export default function AppLayout({ title, children }: Props) {
+export default function AppLayout({ children }: Props) {
     return (
-        <div className="layout">
+        <SidebarProvider>
             <AppSidebar />
-
-            <div className="main-content">
+            <SidebarInset>
                 <Topbar />
-
-                <main className="page-content">
-                    {children}
+                <FlashToasts />
+                <main className="flex-1 p-4 md:p-6 lg:p-8">
+                    <div className="mx-auto w-full max-w-7xl space-y-6">
+                        {children}
+                    </div>
                 </main>
-            </div>
-        </div>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }

@@ -8,7 +8,13 @@ type Status =
     | "devolvido"
     | "atrasado"
     | "interno"
-    | "externo"
+    | "prefeitura"
+    | "pendente"
+    | "aprovada"
+    | "recusada"
+    | "baixa"
+    | "media"
+    | "alta"
 
 const CONFIG: Record<
     Status,
@@ -21,7 +27,13 @@ const CONFIG: Record<
     devolvido: { variant: "secondary", label: "Devolvido" },
     atrasado: { variant: "destructive", label: "Atrasado" },
     interno: { variant: "default", label: "Interno" },
-    externo: { variant: "outline", label: "Externo" },
+    prefeitura: { variant: "outline", label: "Prefeitura" },
+    pendente: { variant: "outline", label: "Pendente" },
+    aprovada: { variant: "default", label: "Aprovada" },
+    recusada: { variant: "destructive", label: "Recusada" },
+    baixa: { variant: "secondary", label: "Baixa" },
+    media: { variant: "outline", label: "Média" },
+    alta: { variant: "destructive", label: "Alta" },
 }
 
 interface StatusBadgeProps {
