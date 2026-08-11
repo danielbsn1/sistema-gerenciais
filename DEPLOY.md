@@ -30,6 +30,10 @@ Como funciona:
 
 - Conta no GitHub com acesso ao repositório `danielbsn1/sistema-gerenciais`
 - O repositório deve estar **público** no GitHub (mais simples) — se for privado, use um **Personal Access Token** no `git clone`
+- **Antes de começar**, enviar a branch `back-end` (que contém toda a preparação do deploy) para o GitHub:
+  ```bash
+  git push origin back-end
+  ```
 - Um domínio (ex.: `sistema.suaempresa.com.br`) — passo 11
 - **Pix** para pagar a VPS
 
@@ -100,7 +104,7 @@ docker compose version
 
 ```bash
 mkdir -p /var/www && cd /var/www
-git clone https://github.com/danielbsn1/sistema-gerenciais.git
+git clone -b back-end https://github.com/danielbsn1/sistema-gerenciais.git
 cd sistema-gerenciais
 ```
 
