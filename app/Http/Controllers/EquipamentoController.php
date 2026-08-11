@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEquipamentoRequest;
 use App\Http\Requests\UpdateEquipamentoRequest;
+use App\Http\Resources\EmprestimoResource;
+use App\Http\Resources\EquipamentoResource;
 use App\Models\Equipamento;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,7 +25,7 @@ class EquipamentoController extends Controller
         });
 
         return Inertia::render('Equipamentos/Index', [
-            'equipamentos' => $query->orderBy('tipo')->get(),
+            'equipamentos' => EquipamentoResource::collection($query->orderBy('tipo')->get())->resolve(),
             'filters' => [
                 'search' => $request->search,
                 'tipo' => $request->tipo,
@@ -47,12 +49,15 @@ class EquipamentoController extends Controller
     public function show(Equipamento $equipamento)
     {
         $historico = $equipamento->emprestimos()->with('funcionario')->latest()->get();
-        return Inertia::render('Equipamentos/Show', ['equipamento' => $equipamento, 'historico' => $historico]);
+        return Inertia::render('Equipamentos/Show', [
+            'equipamento' => EquipamentoResource::make($equipamento)->resolve(),
+            'historico' => EmprestimoResource::collection($historico)->resolve(),
+        ]);
     }
 
     public function edit(Equipamento $equipamento)
     {
-        return Inertia::render('Equipamentos/Edit', ['equipamento' => $equipamento]);
+        return Inertia::render('Equipamentos/Edit', ['equipamento' => EquipamentoResource::make($equipamento)->resolve()]);
     }
 
     public function update(UpdateEquipamentoRequest $request, Equipamento $equipamento)

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\DevolverEmprestimoAction;
 use App\Actions\RegistrarEmprestimoAction;
 use App\Http\Requests\StoreEmprestimoRequest;
+use App\Http\Resources\EmprestimoResource;
+use App\Http\Resources\EquipamentoResource;
+use App\Http\Resources\FuncionarioResource;
 use App\Models\Emprestimo;
 use App\Models\Equipamento;
 use App\Models\Funcionario;
@@ -24,7 +27,7 @@ class EmprestimoController extends Controller
                                          $q->where('nome', 'like', "%{$request->funcionario}%"));
 
         return Inertia::render('Emprestimos/Index', [
-            'emprestimos' => $query->latest()->get(),
+            'emprestimos' => EmprestimoResource::collection($query->latest()->get())->resolve(),
         ]);
     }
 
@@ -34,8 +37,8 @@ class EmprestimoController extends Controller
         $funcionarios = Funcionario::all();
 
         return Inertia::render('Emprestimos/Create', [
-            'equipamentos' => $equipamentos,
-            'funcionarios' => $funcionarios,
+            'equipamentos' => EquipamentoResource::collection($equipamentos)->resolve(),
+            'funcionarios' => FuncionarioResource::collection($funcionarios)->resolve(),
         ]);
     }
 
@@ -67,7 +70,7 @@ class EmprestimoController extends Controller
         $emprestimo->load(['equipamento', 'funcionario']);
 
         return Inertia::render('Emprestimos/Edit', [
-            'emprestimo' => $emprestimo,
+            'emprestimo' => EmprestimoResource::make($emprestimo)->resolve(),
         ]);
     }
 
@@ -96,7 +99,7 @@ class EmprestimoController extends Controller
         $emprestimo->load(['equipamento', 'funcionario']);
 
         return Inertia::render('Emprestimos/Show', [
-            'emprestimo' => $emprestimo,
+            'emprestimo' => EmprestimoResource::make($emprestimo)->resolve(),
         ]);
     }
 }

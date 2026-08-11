@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Solicitacao;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
 
 class SolicitacaoStatusNotification extends Notification
 {
@@ -12,10 +11,10 @@ class SolicitacaoStatusNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
-    public function toMail(object $notifiable): MailMessage
+    public function toDatabase(object $notifiable): array
     {
         $status = match($this->solicitacao->status) {
             'aprovada' => 'aprovada',
@@ -23,9 +22,11 @@ class SolicitacaoStatusNotification extends Notification
             default    => 'atualizada',
         };
 
-        return (new MailMessage)
-            ->subject("Solicitação {$status}")
-            ->line("Sua solicitação de {$this->solicitacao->tipo_equipamento} foi {$status}.")
-            ->line("Motivo: {$this->solicitacao->motivo}");
+        return [
+            'tipo' => 'solicitacao',
+            'solicitacao_id' => $this->solicitacao->id,
+            'status' => $this->solicitacao->status,
+            'mensagem' => "Sua solicitação de {$this->solicitacao->tipo_equipamento} foi {$status}.",
+        ];
     }
 }

@@ -1,4 +1,4 @@
-import { useForm, Link } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -60,13 +60,6 @@ export default function Login() {
                         <Button type="submit" disabled={processing} className="mt-2 w-full">
                             {processing ? "Entrando..." : "Entrar"}
                         </Button>
-
-                        <p className="text-center text-sm text-muted-foreground">
-                            Não tem conta?{" "}
-                            <Link href="/register" className="underline hover:text-primary">
-                                Cadastre-se
-                            </Link>
-                        </p>
                     </form>
                 </CardContent>
             </Card>

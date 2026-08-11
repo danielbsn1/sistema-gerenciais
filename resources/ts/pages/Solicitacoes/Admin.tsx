@@ -89,12 +89,12 @@ const SolicitacoesAdmin: FC<Props> = ({ solicitacoes = [] }) => {
                                             </div>
                                         </TableCell>
                                         <TableCell>{s.tipo_equipamento}</TableCell>
-                                        <TableCell className="max-w-60">
+                                        <TableCell className="max-w-60 truncate">
                                             <span className="text-muted-foreground">
                                                 {s.motivo}
                                             </span>
                                             {s.observacoes && (
-                                                <div className="text-xs text-muted-foreground">
+                                                <div className="truncate text-xs text-muted-foreground">
                                                     {s.observacoes}
                                                 </div>
                                             )}
@@ -162,7 +162,7 @@ const SolicitacoesAdmin: FC<Props> = ({ solicitacoes = [] }) => {
                                     <TableRow key={s.id}>
                                         <TableCell>{s.user.name}</TableCell>
                                         <TableCell>{s.tipo_equipamento}</TableCell>
-                                        <TableCell className="max-w-60 text-muted-foreground">
+                                        <TableCell className="max-w-60 truncate text-muted-foreground">
                                             {s.motivo}
                                         </TableCell>
                                         <TableCell>

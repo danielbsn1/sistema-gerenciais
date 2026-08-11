@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Actions\InativarFuncionarioAction;
 use App\Http\Requests\StoreFuncionarioRequest;
 use App\Http\Requests\UpdateFuncionarioRequest;
+use App\Http\Resources\EmprestimoResource;
+use App\Http\Resources\FuncionarioResource;
 use App\Models\Funcionario;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,7 +26,7 @@ class FuncionarioController extends Controller
         if ($request->tipo)  $query->where('tipo', $request->tipo);
 
         return Inertia::render('Funcionarios/Index', [
-            'funcionarios' => $query->orderBy('nome')->get(),
+            'funcionarios' => FuncionarioResource::collection($query->orderBy('nome')->get())->resolve(),
         ]);
     }
 
@@ -43,12 +45,15 @@ class FuncionarioController extends Controller
     public function show(Funcionario $funcionario)
     {
         $historico = $funcionario->emprestimos()->with('equipamento')->latest()->get();
-        return Inertia::render('Funcionarios/Show', ['funcionario' => $funcionario, 'historico' => $historico]);
+        return Inertia::render('Funcionarios/Show', [
+            'funcionario' => FuncionarioResource::make($funcionario)->resolve(),
+            'historico' => EmprestimoResource::collection($historico)->resolve(),
+        ]);
     }
 
     public function edit(Funcionario $funcionario)
     {
-        return Inertia::render('Funcionarios/Edit', ['funcionario' => $funcionario]);
+        return Inertia::render('Funcionarios/Edit', ['funcionario' => FuncionarioResource::make($funcionario)->resolve()]);
     }
 
     public function update(UpdateFuncionarioRequest $request, Funcionario $funcionario)

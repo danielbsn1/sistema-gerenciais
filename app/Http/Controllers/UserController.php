@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class UserController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('Usuarios/Index', ['usuarios' => $usuarios]);
+        return Inertia::render('Usuarios/Index', ['usuarios' => UserResource::collection($usuarios)->resolve()]);
     }
 
     public function create()
@@ -36,7 +37,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return Inertia::render('Usuarios/Edit', ['usuario' => $user]);
+        return Inertia::render('Usuarios/Edit', ['usuario' => UserResource::make($user)->resolve()]);
     }
 
     public function update(UpdateUserRequest $request, User $user)

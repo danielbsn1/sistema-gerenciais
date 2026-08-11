@@ -21,7 +21,7 @@ class FuncionarioImport implements SkipsOnFailure, ToModel, WithCustomCsvSetting
     public function getCsvSettings(): array
     {
         return [
-            'input_encoding' => 'UTF-8',
+            'input_encoding' => 'guess',
             'delimiter' => ',',
         ];
     }

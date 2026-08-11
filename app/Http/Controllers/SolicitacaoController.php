@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AvaliarSolicitacaoAction;
 use App\Http\Requests\AvaliarSolicitacaoRequest;
 use App\Http\Requests\StoreSolicitacaoRequest;
+use App\Http\Resources\SolicitacaoResource;
 use App\Models\Solicitacao;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -22,7 +23,7 @@ class SolicitacaoController extends Controller
             ->get();
 
         return Inertia::render('Solicitacoes/Index', [
-            'solicitacoes' => $solicitacoes,
+            'solicitacoes' => SolicitacaoResource::collection($solicitacoes)->resolve(),
         ]);
     }
 
@@ -33,7 +34,7 @@ class SolicitacaoController extends Controller
             ->get();
 
         return Inertia::render('Solicitacoes/Admin', [
-            'solicitacoes' => $solicitacoes,
+            'solicitacoes' => SolicitacaoResource::collection($solicitacoes)->resolve(),
         ]);
     }
 
