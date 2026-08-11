@@ -21,6 +21,7 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import StatusBadge from "../../components/StatusBadge";
+import { ImportDialog } from "../../components/ImportDialog";
 import { Funcionario } from "../../types/funcionarios";
 
 type FuncionarioComAtivo = Funcionario & { ativo: boolean };
@@ -61,9 +62,17 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
                         Gerencie os colaboradores
                     </p>
                 </div>
-                <Button render={<Link href="/funcionarios/create" />}>
-                    + Cadastrar
-                </Button>
+                <div className="flex items-center gap-2">
+                    <ImportDialog
+                        title="Importar Funcionários"
+                        description="Envie uma planilha (.xlsx, .xls ou .csv). Campos obrigatórios: nome, cpf, cargo, setor e telefone."
+                        templateHref="/funcionarios/importar/template"
+                        importUrl="/funcionarios/importar"
+                    />
+                    <Button render={<Link href="/funcionarios/create" />}>
+                        + Cadastrar
+                    </Button>
+                </div>
             </div>
 
             <Card>

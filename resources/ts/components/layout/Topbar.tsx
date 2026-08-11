@@ -1,11 +1,13 @@
 import { router, usePage } from "@inertiajs/react";
 import {
     Bell,
+    BellOff,
     ChevronDown,
     LogOut,
     Monitor,
     Moon,
     Sun,
+    Download,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,7 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useTheme } from "@/components/theme/theme-provider";
+import { SystemNotification } from "@/types/usuario";
 
 function ThemeMenu() {
     const { theme, setTheme } = useTheme();
@@ -81,6 +84,24 @@ function ThemeMenu() {
 }
 
 function NotificationsMenu() {
+    const { notificacoes } = usePage().props as {
+        notificacoes?: SystemNotification[];
+    };
+    const lista = notificacoes ?? [];
+    const naoLidas = lista.filter((n) => !n.read_at).length;
+
+    function formatarData(iso?: string) {
+        if (!iso) return "";
+        const data = new Date(iso);
+        return data.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -89,20 +110,83 @@ function NotificationsMenu() {
                         variant="ghost"
                         size="icon"
                         aria-label="Notificações"
-                        className="rounded-full"
+                        className="relative rounded-full"
                     />
                 }
             >
                 <Bell className="size-4" />
+                {naoLidas > 0 && (
+                    <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-semibold text-destructive-foreground">
+                        {naoLidas}
+                    </span>
+                )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={8} className="w-72">
-                <DropdownMenuGroup>
+            <DropdownMenuContent align="end" sideOffset={8} className="w-80">
+                <DropdownMenuGroup className="flex items-center justify-between">
                     <DropdownMenuLabel>Notificações</DropdownMenuLabel>
+                    {naoLidas > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs"
+                            onClick={() =>
+                                router.post("/notificacoes/read-all", {}, {
+                                    preserveScroll: true,
+                                })
+                            }
+                        >
+                            Marcar todas como lidas
+                        </Button>
+                    )}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                    Você não tem notificações
-                </div>
+                {lista.length === 0 ? (
+                    <div className="flex flex-col items-center gap-2 px-2 py-6 text-center text-sm text-muted-foreground">
+                        <BellOff className="size-5" />
+                        Você não tem notificações
+                    </div>
+                ) : (
+                    <div className="max-h-80 overflow-y-auto">
+                        {lista.map((n) => (
+                            <div
+                                key={n.id}
+                                className={
+                                    n.read_at
+                                        ? "border-b px-2 py-2 last:border-b-0"
+                                        : "border-b bg-primary/5 px-2 py-2 last:border-b-0"
+                                }
+                            >
+                                <div className="flex items-start justify-between gap-2">
+                                    <p className="text-sm">{n.data?.mensagem ?? "Notificação"}</p>
+                                    {!n.read_at && (
+                                        <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" />
+                                    )}
+                                </div>
+                                <div className="mt-1 flex items-center justify-between gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                        {formatarData(n.created_at)}
+                                    </span>
+                                    {n.data?.caminho_erros && (
+                                        <a
+                                            href={`/notificacoes/${n.id}/erros`}
+                                            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                                        >
+                                            <Download className="size-3" />
+                                            Baixar erros
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onClick={() => router.get("/notificacoes")}
+                    className="justify-center text-center"
+                >
+                    Ver todas
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

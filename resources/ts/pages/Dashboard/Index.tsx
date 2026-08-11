@@ -13,7 +13,10 @@ interface Props {
     disponiveis: number;
     emUso: number;
     manutencao: number;
+    inativos: number;
     funcionarios: number;
+    porTipo: Record<string, number>;
+    porStatus: Record<string, number>;
 }
 
 export default function Dashboard({
@@ -21,7 +24,10 @@ export default function Dashboard({
     disponiveis,
     emUso,
     manutencao,
+    inativos,
     funcionarios,
+    porTipo,
+    porStatus,
 }: Props) {
     return (
         <AppLayout>
@@ -36,7 +42,7 @@ export default function Dashboard({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 <StatCard
                     title="Total"
                     value={totalEquipamentos}
@@ -58,13 +64,18 @@ export default function Dashboard({
                     icon={<Wrench className="size-5" />}
                 />
                 <StatCard
+                    title="Inativos"
+                    value={inativos}
+                    icon={<Package className="size-5" />}
+                />
+                <StatCard
                     title="Funcionários"
                     value={funcionarios}
                     icon={<Users className="size-5" />}
                 />
             </div>
 
-            <ChartPieInteractive />
+            <ChartPieInteractive porTipo={porTipo} porStatus={porStatus} />
         </AppLayout>
     );
 }

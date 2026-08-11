@@ -2,10 +2,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Emprestimo;
 use App\Models\User;
+
 class Equipamento extends Model {
+    use HasFactory;
     protected $fillable = [
         'patrimonio_id', 'tipo', 'marca', 'modelo', 'numero_serie',
         'processador', 'memoria_ram', 'armazenamento', 'sistema_operacional',

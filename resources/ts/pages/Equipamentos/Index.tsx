@@ -20,6 +20,7 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import StatusBadge from "../../components/StatusBadge";
+import { ImportDialog } from "../../components/ImportDialog";
 import { Equipamento } from "../../types/funcionarios";
 
 interface Props {
@@ -86,9 +87,17 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
                         Gerencie os ativos do inventário
                     </p>
                 </div>
-                <Button render={<Link href="/equipamentos/create" />}>
-                    + Cadastrar
-                </Button>
+                <div className="flex items-center gap-2">
+                    <ImportDialog
+                        title="Importar Equipamentos"
+                        description="Envie uma planilha (.xlsx, .xls ou .csv). Campos obrigatórios: patrimonio_id, marca, modelo e tipo."
+                        templateHref="/equipamentos/importar/template"
+                        importUrl="/equipamentos/importar"
+                    />
+                    <Button render={<Link href="/equipamentos/create" />}>
+                        + Cadastrar
+                    </Button>
+                </div>
             </div>
 
             <Card>

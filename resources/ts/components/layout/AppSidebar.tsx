@@ -5,6 +5,8 @@ import {
     Users,
     ArrowLeftRight,
     ClipboardList,
+    FileText,
+    UserCog,
 } from "lucide-react";
 import {
     Sidebar,
@@ -31,6 +33,12 @@ export function AppSidebar() {
             label: "Solicitações",
             icon: ClipboardList,
         },
+        ...(isAdmin
+            ? [
+                  { href: "/relatorios", label: "Relatórios", icon: FileText },
+                  { href: "/usuarios", label: "Usuários", icon: UserCog },
+              ]
+            : []),
     ];
 
     return (

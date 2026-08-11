@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+    // Registro público desativado: usuários são criados pelo admin em /usuarios
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
