@@ -1,11 +1,23 @@
 import { FC } from "react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
-import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
+import { Link } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from "@/components/ui/card";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Equipamento, Emprestimo } from "../../types/funcionarios";
-import "../../styles/showeq.css";
-import "../../styles/equipamentos.css";
 
 interface Props {
     equipamento: Equipamento;
@@ -15,133 +27,134 @@ interface Props {
 const EquipamentosShow: FC<Props> = ({ equipamento, historico }) => {
     return (
         <AppLayout title="Equipamentos">
-            {/* Header */}
-            <div className="page-header">
-                <div className="page-header__info">
-                    <h2>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
                         {equipamento.marca} {equipamento.modelo}
-                    </h2>
-                    <p>#{equipamento.id_patrimonio}</p>
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        #{equipamento.patrimonio_id}
+                    </p>
                 </div>
-                <div className="page-header__actions">
-                    <Button
-                        as="link"
-                        href="/equipamentos"
-                        variant="secondary"
-                        size="sm"
-                    >
-                        ← Voltar
+                <div className="flex gap-2">
+                    <Button render={<Link href="/equipamentos" />} variant="outline">
+                        Voltar
                     </Button>
                     <Button
-                        as="link"
-                        href={`/equipamentos/${equipamento.id}/edit`}
-                        variant="primary"
-                        size="sm"
+                        render={<Link href={`/equipamentos/${equipamento.id}/edit`} />}
                     >
                         Editar
                     </Button>
                 </div>
             </div>
 
-            {/* Details */}
-            <Card style={{ marginBottom: 20 }}>
-                <CardHeader title="Dados do Equipamento" />
-                <CardBody>
-                    <div className="detail-grid">
-                        <div className="detail-item">
-                            <span className="detail-label">ID Patrimônio</span>
-                            <span
-                                className="detail-value"
-                                style={{ fontFamily: "monospace" }}
-                            >
-                                #{equipamento.id_patrimonio}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Dados do Equipamento</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                ID Patrimônio
+                            </span>
+                            <span className="font-mono text-sm font-medium">
+                                #{equipamento.patrimonio_id}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Tipo</span>
-                            <span className="detail-value">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Tipo
+                            </span>
+                            <span className="text-sm font-medium capitalize">
                                 {equipamento.tipo}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Marca</span>
-                            <span className="detail-value">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Marca
+                            </span>
+                            <span className="text-sm font-medium">
                                 {equipamento.marca}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Modelo</span>
-                            <span className="detail-value">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Modelo
+                            </span>
+                            <span className="text-sm font-medium">
                                 {equipamento.modelo}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Status</span>
-                            <div style={{ marginTop: 4 }}>
-                                <Badge variant={equipamento.status} />
-                            </div>
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Status
+                            </span>
+                            <StatusBadge status={equipamento.status} />
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Usuário Atual</span>
-                            <span className="detail-value">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Usuário Atual
+                            </span>
+                            <span className="text-sm font-medium">
                                 {equipamento.usuario_atual ?? "—"}
                             </span>
                         </div>
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
 
-            {/* Histórico */}
             <Card>
-                <CardHeader title="Histórico de Empréstimos" />
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+                <CardHeader>
+                    <CardTitle>Histórico de Empréstimos</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>Funcionário</th>
-                                <th>Setor</th>
-                                <th>Início</th>
-                                <th>Devolução</th>
-                                <th>Status</th>
+                                <TableHead>Funcionário</TableHead>
+                                <TableHead>Setor</TableHead>
+                                <TableHead>Início</TableHead>
+                                <TableHead>Devolução</TableHead>
+                                <TableHead>Status</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {historico.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={5}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhum empréstimo registrado.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 historico.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>{emp.funcionario.nome}</td>
-                                        <td>
-                                            <span className="chip">
-                                                {emp.setor}
-                                            </span>
-                                        </td>
-                                        <td>
+                                    <TableRow key={emp.id}>
+                                        <TableCell>{emp.funcionario.nome}</TableCell>
+                                        <TableCell>{emp.setor}</TableCell>
+                                        <TableCell>
                                             {new Date(
                                                 emp.data_inicio,
                                             ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td>
+                                        </TableCell>
+                                        <TableCell>
                                             {emp.data_devolucao
                                                 ? new Date(
                                                       emp.data_devolucao,
                                                   ).toLocaleDateString("pt-BR")
                                                 : "—"}
-                                        </td>
-                                        <td>
-                                            <Badge variant={emp.status} />
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={emp.status} />
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
             </Card>
         </AppLayout>
     );

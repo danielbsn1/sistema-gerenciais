@@ -1,4 +1,14 @@
 import { useForm } from "@inertiajs/react";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/Field";
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -12,29 +22,47 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <h1>Login</h1>
+        <div className="flex min-h-svh items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-sm">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-xl">
+                        Sistema<span className="text-primary">Gerenciais</span>
+                    </CardTitle>
+                    <CardDescription>
+                        Faça login para continuar
+                    </CardDescription>
+                </CardHeader>
 
-            <form onSubmit={submit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={data.email}
-                    onChange={(e) => setData("email", e.target.value)}
-                />
+                <CardContent>
+                    <form onSubmit={submit} className="grid gap-4">
+                        <Field label="E-mail" required error={errors.email}>
+                            <Input
+                                type="email"
+                                placeholder="seu@email.com"
+                                value={data.email}
+                                onChange={(e) => setData("email", e.target.value)}
+                                aria-invalid={!!errors.email}
+                            />
+                        </Field>
 
-                <input
-                    type="password"
-                    placeholder="Senha"
-                    value={data.password}
-                    onChange={(e) => setData("password", e.target.value)}
-                />
+                        <Field label="Senha" required error={errors.password}>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
+                                aria-invalid={!!errors.password}
+                            />
+                        </Field>
 
-                <button disabled={processing}>Entrar</button>
-
-                {errors.email && <p>{errors.email}</p>}
-                {errors.password && <p>{errors.password}</p>}
-            </form>
+                        <Button type="submit" disabled={processing} className="mt-2 w-full">
+                            {processing ? "Entrando..." : "Entrar"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }

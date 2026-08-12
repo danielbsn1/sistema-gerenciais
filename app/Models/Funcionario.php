@@ -18,6 +18,6 @@ class Funcionario extends Model {
     }
 
     public function emprestimoAtivo() {
-        return $this->hasOne(Emprestimo::class)->where('status', 'ativo','inativo')->latest();
+        return $this->hasOne(Emprestimo::class)->where('status', 'ativo')->latest();
     }
 }

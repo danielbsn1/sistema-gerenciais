@@ -1,11 +1,11 @@
 
 export type StatusEquipamento = 'disponivel' | 'em_uso' | 'manutencao';
-export type TipoFuncionario   = 'interno' | 'externo';
+export type TipoFuncionario   = 'interno' | 'prefeitura';
 export type StatusEmprestimo  = 'ativo' | 'devolvido' | 'atrasado';
 
 export interface Equipamento {
   id: number;
-  id_patrimonio: string;
+  patrimonio_id: string;
   tipo: string;
   marca: string;
   modelo: string;

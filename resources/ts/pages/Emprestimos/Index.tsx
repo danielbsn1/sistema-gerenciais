@@ -1,18 +1,38 @@
 // resources/ts/pages/Emprestimos/Index.tsx
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
+import StatusBadge from "../../components/StatusBadge";
 import { Emprestimo } from "../../types/funcionarios";
-import "../../styles/form.css";
-import "../../styles/equipamentos.css";
-import "../../styles/showeq.css";
 
 interface Props {
     emprestimos: Emprestimo[];
     filters: { search?: string; status?: string };
 }
+
+const STATUS = [
+    { value: "ativo", label: "Ativo" },
+    { value: "devolvido", label: "Devolvido" },
+    { value: "atrasado", label: "Atrasado" },
+];
 
 const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
@@ -36,129 +56,118 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
 
     return (
         <AppLayout>
-            {/* Filters */}
-            <div className="filters-card">
-                <div className="filter-group">
-                    <label className="filter-label">Buscar</label>
-                    <input
-                        className="filter-input"
-                        placeholder="Funcionário, equipamento..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleFilter()}
-                    />
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Empréstimos
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Acompanhe os empréstimos de equipamentos
+                    </p>
                 </div>
-
-                <div className="filter-group">
-                    <label className="filter-label">Status</label>
-                    <select
-                        className="filter-select"
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="devolvido">Devolvido</option>
-                        <option value="atrasado">Atrasado</option>
-                    </select>
-                </div>
-
-                <Button variant="primary" onClick={handleFilter}>
-                    Filtrar
+                <Button render={<Link href="/emprestimos/create" />}>
+                    + Novo Empréstimo
                 </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
-                    Limpar
-                </button>
             </div>
 
-            {/* Table */}
-            <div className="card">
-                <div className="card__header">
-                    <span className="list-header__count">
-                        {emprestimos.length} empréstimo(s)
-                    </span>
-                    <Button
-                        as="link"
-                        href="/emprestimos/create"
-                        variant="primary"
-                        size="sm"
-                    >
-                        + Novo Empréstimo
-                    </Button>
-                </div>
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Buscar</label>
+                            <Input
+                                placeholder="Funcionário, equipamento..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && handleFilter()
+                                }
+                                className="w-full sm:w-64"
+                            />
+                        </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Status</label>
+                            <Select
+                                value={status || null}
+                                onValueChange={(value) => setStatus(value ?? "")}
+                            >
+                                <SelectTrigger className="w-full sm:w-40">
+                                    <SelectValue placeholder="Todos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {STATUS.map((s) => (
+                                        <SelectItem key={s.value} value={s.value}>
+                                            {s.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button onClick={handleFilter}>Filtrar</Button>
+                            <Button variant="ghost" onClick={handleClear}>
+                                Limpar
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>Equipamento</th>
-                                <th>Funcionário</th>
-                                <th>Setor</th>
-                                <th>Início</th>
-                                <th>Prev. Devolução</th>
-                                <th>Status</th>
-                                <th>Ações</th>
+                                <TableHead>Equipamento</TableHead>
+                                <TableHead>Funcionário</TableHead>
+                                <TableHead>Setor</TableHead>
+                                <TableHead>Início</TableHead>
+                                <TableHead>Prev. Devolução</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Ações</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {emprestimos.length === 0 ? (
-                                <tr>
-                                    <td colSpan={7} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={7}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhum empréstimo registrado.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 emprestimos.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>
+                                    <TableRow key={emp.id}>
+                                        <TableCell>
                                             {emp.equipamento.marca}{" "}
                                             {emp.equipamento.modelo}
-                                            <div
-                                                style={{
-                                                    fontSize: 11,
-                                                    color: "var(--text-muted)",
-                                                    fontFamily: "monospace",
-                                                }}
-                                            >
-                                                #{emp.equipamento.id_patrimonio}
+                                            <div className="font-mono text-[11px] text-muted-foreground">
+                                                #{emp.equipamento.patrimonio_id}
                                             </div>
-                                        </td>
-                                        <td>{emp.funcionario.nome}</td>
-                                        <td>
-                                            <span className="chip">
-                                                {emp.setor}
-                                            </span>
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontVariantNumeric:
-                                                    "tabular-nums",
-                                            }}
-                                        >
+                                        </TableCell>
+                                        <TableCell>{emp.funcionario.nome}</TableCell>
+                                        <TableCell>{emp.setor}</TableCell>
+                                        <TableCell className="tabular-nums">
                                             {new Date(
                                                 emp.data_inicio,
                                             ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontVariantNumeric:
-                                                    "tabular-nums",
-                                            }}
-                                        >
+                                        </TableCell>
+                                        <TableCell className="tabular-nums">
                                             {emp.data_prevista_devolucao
                                                 ? new Date(
                                                       emp.data_prevista_devolucao,
                                                   ).toLocaleDateString("pt-BR")
                                                 : "—"}
-                                        </td>
-                                        <td>
-                                            <Badge variant={emp.status} />
-                                        </td>
-                                        <td>
-                                            <div className="table__actions">
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={emp.status} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-end gap-1">
                                                 <Button
-                                                    as="link"
-                                                    href={`/emprestimos/${emp.id}`}
+                                                    render={<Link href={`/emprestimos/${emp.id}`} />}
                                                     variant="link"
                                                     size="sm"
                                                 >
@@ -166,26 +175,25 @@ const EmprestimosIndex: FC<Props> = ({ emprestimos = [], filters = {} }) => {
                                                 </Button>
                                                 {emp.status === "ativo" && (
                                                     <Button
-                                                        variant="link-warning"
+                                                        variant="link"
                                                         size="sm"
+                                                        className="text-destructive hover:text-destructive"
                                                         onClick={() =>
-                                                            handleDevolver(
-                                                                emp.id,
-                                                            )
+                                                            handleDevolver(emp.id)
                                                         }
                                                     >
                                                         Devolver
                                                     </Button>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </AppLayout>
     );
 };

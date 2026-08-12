@@ -1,14 +1,22 @@
 // resources/ts/pages/Funcionarios/Edit.tsx
 import { FC } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import {
     Card,
-    CardHeader,
-    CardBody,
+    CardContent,
     CardFooter,
-} from "../../components/ui/Modal";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Field } from "@/components/Field";
 import { Funcionario } from "../../types/funcionarios";
 
 interface Props {
@@ -30,110 +38,81 @@ const FuncionariosEdit: FC<Props> = ({ funcionario }) => {
 
     return (
         <AppLayout title="Funcionários">
-            <Card>
-                <CardHeader
-                    title="Editar Funcionário"
-                    subtitle={funcionario.nome}
-                />
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Editar Funcionário
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        {funcionario.nome}
+                    </p>
+                </div>
+                <Button render={<Link href="/funcionarios" />} variant="outline">
+                    Voltar
+                </Button>
+            </div>
 
-                <CardBody>
-                    <form
-                        onSubmit={handleSubmit}
-                        className="form"
-                        id="edit-func-form"
-                    >
-                        <div className="form-grid">
-                            <div className="form-group form-group--full">
-                                <label className="form-label form-label--required">
-                                    Nome Completo
-                                </label>
-                                <input
-                                    className={`form-input ${errors.nome ? "is-error" : ""}`}
+            <Card className="mx-auto max-w-3xl">
+                <form onSubmit={handleSubmit} id="edit-func-form">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <Field
+                                label="Nome Completo"
+                                required
+                                error={errors.nome}
+                                className="sm:col-span-2"
+                            >
+                                <Input
                                     value={data.nome}
-                                    onChange={(e) =>
-                                        setData("nome", e.target.value)
-                                    }
+                                    onChange={(e) => setData("nome", e.target.value)}
+                                    aria-invalid={!!errors.nome}
                                 />
-                                {errors.nome && (
-                                    <span className="form-error">
-                                        {errors.nome}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    CPF
-                                </label>
-                                <input
-                                    className={`form-input ${errors.cpf ? "is-error" : ""}`}
+                            <Field label="CPF" required error={errors.cpf}>
+                                <Input
                                     value={data.cpf}
-                                    onChange={(e) =>
-                                        setData("cpf", e.target.value)
-                                    }
+                                    onChange={(e) => setData("cpf", e.target.value)}
+                                    aria-invalid={!!errors.cpf}
                                 />
-                                {errors.cpf && (
-                                    <span className="form-error">
-                                        {errors.cpf}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Setor
-                                </label>
-                                <input
-                                    className={`form-input ${errors.setor ? "is-error" : ""}`}
+                            <Field label="Setor" required error={errors.setor}>
+                                <Input
                                     value={data.setor}
-                                    onChange={(e) =>
-                                        setData("setor", e.target.value)
-                                    }
+                                    onChange={(e) => setData("setor", e.target.value)}
+                                    aria-invalid={!!errors.setor}
                                 />
-                                {errors.setor && (
-                                    <span className="form-error">
-                                        {errors.setor}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Tipo
-                                </label>
-                                <select
-                                    className={`form-select ${errors.tipo ? "is-error" : ""}`}
-                                    value={data.tipo}
-                                    onChange={(e) =>
-                                        setData("tipo", e.target.value as any)
+                            <Field label="Tipo" required error={errors.tipo}>
+                                <Select
+                                    value={data.tipo || null}
+                                    onValueChange={(value) =>
+                                        setData("tipo", value as any)
                                     }
                                 >
-                                    <option value="interno">Interno</option>
-                                    <option value="externo">Externo</option>
-                                </select>
-                                {errors.tipo && (
-                                    <span className="form-error">
-                                        {errors.tipo}
-                                    </span>
-                                )}
-                            </div>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="interno">Interno</SelectItem>
+                                        <SelectItem value="prefeitura">Prefeitura</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </Field>
                         </div>
-                    </form>
-                </CardBody>
+                    </CardContent>
 
-                <CardFooter>
-                    <Button as="link" href="/funcionarios" variant="secondary">
-                        Cancelar
-                    </Button>
-                    <Button
-                        type="submit"
-                        form="edit-func-form"
-                        variant="primary"
-                        disabled={processing}
-                    >
-                        {processing ? "Salvando..." : "Salvar Alterações"}
-                    </Button>
-                </CardFooter>
+                    <CardFooter className="justify-end gap-2">
+                        <Button render={<Link href="/funcionarios" />} variant="outline">
+                            Cancelar
+                        </Button>
+                        <Button type="submit" form="edit-func-form" disabled={processing}>
+                            {processing ? "Salvando..." : "Salvar Alterações"}
+                        </Button>
+                    </CardFooter>
+                </form>
             </Card>
         </AppLayout>
     );

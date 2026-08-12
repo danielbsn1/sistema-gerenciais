@@ -1,11 +1,27 @@
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
-import "../../components/table/EquipamentoTable";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
+import StatusBadge from "../../components/StatusBadge";
+import { ImportDialog } from "../../components/ImportDialog";
 import { Equipamento } from "../../types/funcionarios";
-import "../../styles/equipamentos.css";
 
 interface Props {
     equipamentos: Equipamento[];
@@ -13,15 +29,19 @@ interface Props {
 }
 
 const TIPOS = [
-    "Notebook",
-    "Desktop",
-    "Monitor",
-    "Tablet",
-    "Celular",
-    "Impressora",
-    "Outros",
+    { value: "notebook", label: "Notebook" },
+    { value: "desktop", label: "Desktop" },
+    { value: "monitor", label: "Monitor" },
+    { value: "tablet", label: "Tablet" },
+    { value: "celular", label: "Celular" },
+    { value: "impressora", label: "Impressora" },
+    { value: "outros", label: "Outros" },
 ];
-const STATUS = ["disponivel", "em_uso", "manutencao"];
+const STATUS = [
+    { value: "disponivel", label: "Disponível" },
+    { value: "em_uso", label: "Em Uso" },
+    { value: "manutencao", label: "Manutenção" },
+];
 
 const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
     const [search, setSearch] = useState(filters.search ?? "");
@@ -50,9 +70,6 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
 
         router.delete(`/equipamentos/${id}`, {
             preserveScroll: true,
-            onSuccess: () => {
-                console.log("Equipamento excluído");
-            },
             onError: (errors) => {
                 console.error(errors);
             },
@@ -61,151 +78,162 @@ const EquipamentosIndex: FC<Props> = ({ equipamentos = [], filters = {} }) => {
 
     return (
         <AppLayout title="Equipamentos">
-            {/* Filters */}
-            <div className="filters-card">
-                <div className="filter-group">
-                    <label className="filter-label">Buscar</label>
-                    <input
-                        className="filter-input"
-                        placeholder="ID, marca, modelo..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleFilter()}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Equipamentos
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Gerencie os ativos do inventário
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <ImportDialog
+                        title="Importar Equipamentos"
+                        description="Envie uma planilha (.xlsx, .xls ou .csv). Campos obrigatórios: patrimonio_id, marca, modelo e tipo."
+                        templateHref="/equipamentos/importar/template"
+                        importUrl="/equipamentos/importar"
                     />
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label">Tipo</label>
-                    <select
-                        className="filter-select"
-                        value={tipo}
-                        onChange={(e) => setTipo(e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        {TIPOS.map((t) => (
-                            <option key={t} value={t}>
-                                {t}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label">Status</label>
-                    <select
-                        className="filter-select"
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        {STATUS.map((s) => (
-                            <option key={s} value={s}>
-                                {s === "disponivel"
-                                    ? "Disponível"
-                                    : s === "em_uso"
-                                      ? "Em Uso"
-                                      : "Manutenção"}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <Button variant="primary" onClick={handleFilter}>
-                    Filtrar
-                </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
-                    Limpar
-                </button>
-            </div>
-
-            {/* Table Card */}
-            <div className="card">
-                <div className="card__header">
-                    <span className="list-header__count">
-                        {equipamentos.length} equipamento(s)
-                    </span>
-                    <Button
-                        as="link"
-                        href="/equipamentos/create"
-                        variant="primary"
-                        size="sm"
-                    >
+                    <Button render={<Link href="/equipamentos/create" />}>
                         + Cadastrar
                     </Button>
                 </div>
+            </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Buscar</label>
+                            <Input
+                                placeholder="ID, marca, modelo..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && handleFilter()
+                                }
+                                className="w-full sm:w-56"
+                            />
+                        </div>
+
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Tipo</label>
+                            <Select
+                                value={tipo || null}
+                                onValueChange={(value) => setTipo(value ?? "")}
+                            >
+                                <SelectTrigger className="w-full sm:w-40">
+                                    <SelectValue placeholder="Todos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {TIPOS.map((t) => (
+                                        <SelectItem key={t.value} value={t.value}>
+                                            {t.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Status</label>
+                            <Select
+                                value={status || null}
+                                onValueChange={(value) => setStatus(value ?? "")}
+                            >
+                                <SelectTrigger className="w-full sm:w-40">
+                                    <SelectValue placeholder="Todos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {STATUS.map((s) => (
+                                        <SelectItem key={s.value} value={s.value}>
+                                            {s.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button onClick={handleFilter}>Filtrar</Button>
+                            <Button variant="ghost" onClick={handleClear}>
+                                Limpar
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>ID Patrimônio</th>
-                                <th>Tipo</th>
-                                <th>Equipamento</th>
-                                <th>Status</th>
-                                <th>Usuário</th>
-                                <th>Ações</th>
+                                <TableHead>ID Patrimônio</TableHead>
+                                <TableHead>Tipo</TableHead>
+                                <TableHead>Equipamento</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Usuário</TableHead>
+                                <TableHead className="text-right">Ações</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {equipamentos.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhum equipamento cadastrado.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 equipamentos.map((eq) => (
-                                    <tr key={eq.id}>
-                                        <td
-                                            style={{
-                                                fontFamily: "monospace",
-                                                fontSize: 13,
-                                            }}
-                                        >
-                                            #{eq.id_patrimonio}
-                                        </td>
-                                        <td>{eq.tipo}</td>
-                                        <td>
+                                    <TableRow key={eq.id}>
+                                        <TableCell className="font-mono text-[13px]">
+                                            #{eq.patrimonio_id}
+                                        </TableCell>
+                                        <TableCell>{eq.tipo}</TableCell>
+                                        <TableCell>
                                             {eq.marca} {eq.modelo}
-                                        </td>
-                                        <td>
-                                            <Badge variant={eq.status} />
-                                        </td>
-                                        <td>{eq.usuario_atual ?? "—"}</td>
-                                        <td>
-                                            <div className="table__actions">
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={eq.status} />
+                                        </TableCell>
+                                        <TableCell>
+                                            {eq.usuario_atual ?? "—"}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-end gap-1">
                                                 <Button
-                                                    as="link"
-                                                    href={`/equipamentos/${eq.id}`}
+                                                    render={<Link href={`/equipamentos/${eq.id}`} />}
                                                     variant="link"
                                                     size="sm"
                                                 >
                                                     Ver
                                                 </Button>
                                                 <Button
-                                                    as="link"
-                                                    href={`/equipamentos/${eq.id}/edit`}
-                                                    variant="link-warning"
+                                                    render={<Link href={`/equipamentos/${eq.id}/edit`} />}
+                                                    variant="link"
                                                     size="sm"
                                                 >
                                                     Editar
                                                 </Button>
                                                 <Button
-                                                    variant="link-danger"
+                                                    variant="link"
                                                     size="sm"
+                                                    className="text-destructive hover:text-destructive"
                                                     onClick={() => handleDelete(eq.id)}
                                                 >
                                                     Excluir
                                                 </Button>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </AppLayout>
     );
 };

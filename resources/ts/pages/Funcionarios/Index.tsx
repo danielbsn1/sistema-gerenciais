@@ -1,14 +1,30 @@
 // resources/ts/pages/Funcionarios/Index.tsx
 import { FC, useState } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
+import StatusBadge from "../../components/StatusBadge";
+import { ImportDialog } from "../../components/ImportDialog";
 import { Funcionario } from "../../types/funcionarios";
 
 type FuncionarioComAtivo = Funcionario & { ativo: boolean };
-import "../../styles/equipamentos.css";
-import "../../styles/showeq.css";
 
 interface Props {
     funcionarios: FuncionarioComAtivo[];
@@ -37,138 +53,174 @@ const FuncionariosIndex: FC<Props> = ({ funcionarios = [], filters = {} }) => {
 
     return (
         <AppLayout title="Funcionários">
-            {/* Filters */}
-            <div className="filters-card">
-                <div className="filter-group">
-                    <label className="filter-label">Buscar</label>
-                    <input
-                        className="filter-input"
-                        placeholder="Nome, CPF..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleFilter()}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Funcionários
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Gerencie os colaboradores
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <ImportDialog
+                        title="Importar Funcionários"
+                        description="Envie uma planilha (.xlsx, .xls ou .csv). Campos obrigatórios: nome, cpf, cargo, setor e telefone."
+                        templateHref="/funcionarios/importar/template"
+                        importUrl="/funcionarios/importar"
                     />
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label">Setor</label>
-                    <input
-                        className="filter-input"
-                        placeholder="Ex: Campo"
-                        value={setor}
-                        onChange={(e) => setSetor(e.target.value)}
-                    />
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label">Tipo</label>
-                    <select
-                        className="filter-select"
-                        value={tipo}
-                        onChange={(e) => setTipo(e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="interno">Interno</option>
-                        <option value="externo">Externo</option>
-                    </select>
-                </div>
-
-                <Button variant="primary" onClick={handleFilter}>
-                    Filtrar
-                </Button>
-                <button className="btn--ghost-text" onClick={handleClear}>
-                    Limpar
-                </button>
-            </div>
-
-            {/* Table */}
-            <div className="card">
-                <div className="card__header">
-                    <span className="list-header__count">
-                        {funcionarios.length} funcionário(s)
-                    </span>
-                    <Button
-                        as="link"
-                        href="/funcionarios/create"
-                        variant="primary"
-                        size="sm"
-                    >
+                    <Button render={<Link href="/funcionarios/create" />}>
                         + Cadastrar
                     </Button>
                 </div>
+            </div>
 
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Buscar</label>
+                            <Input
+                                placeholder="Nome, CPF..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && handleFilter()
+                                }
+                                className="w-full sm:w-56"
+                            />
+                        </div>
+
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Setor</label>
+                            <Input
+                                placeholder="Ex: Campo"
+                                value={setor}
+                                onChange={(e) => setSetor(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && handleFilter()
+                                }
+                                className="w-full sm:w-40"
+                            />
+                        </div>
+
+                        <div className="grid gap-1.5">
+                            <label className="text-sm font-medium">Tipo</label>
+                            <Select
+                                value={tipo || null}
+                                onValueChange={(value) => setTipo(value ?? "")}
+                            >
+                                <SelectTrigger className="w-full sm:w-40">
+                                    <SelectValue placeholder="Todos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="interno">Interno</SelectItem>
+                                    <SelectItem value="prefeitura">Prefeitura</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button onClick={handleFilter}>Filtrar</Button>
+                            <Button variant="ghost" onClick={handleClear}>
+                                Limpar
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Setor</th>
-                                <th>Tipo</th>
-                                <th>Equipamento</th>
-                                <th>Ações</th>
+                                <TableHead>Nome</TableHead>
+                                <TableHead>CPF</TableHead>
+                                <TableHead>Setor</TableHead>
+                                <TableHead>Tipo</TableHead>
+                                <TableHead>Equipamento</TableHead>
+                                <TableHead className="text-right">Ações</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {funcionarios.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhum funcionário cadastrado.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 funcionarios.map((f) => (
-                                    <tr key={f.id}>
-                                        <td>{f.nome}</td>
-                                        <td style={{ fontFamily: "monospace", fontSize: 13 }}>
+                                    <TableRow key={f.id}>
+                                        <TableCell className="font-medium">
+                                            {f.nome}
+                                        </TableCell>
+                                        <TableCell className="font-mono text-[13px]">
                                             {f.cpf}
-                                        </td>
-                                        <td>
-                                            <span className="chip">{f.setor}</span>
-                                        </td>
-                                        <td>
-                                            <Badge variant={f.tipo} />
-                                        </td>
-                                        <td>{f.equipamento_atual ?? "—"}</td>
-                                        <td>
-                                            <div className="table__actions">
+                                        </TableCell>
+                                        <TableCell>{f.setor}</TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={f.tipo} />
+                                        </TableCell>
+                                        <TableCell>
+                                            {f.equipamento_atual ?? "—"}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-end gap-1">
                                                 <Button
-                                                    as="link"
-                                                    href={`/funcionarios/${f.id}`}
+                                                    render={<Link href={`/funcionarios/${f.id}`} />}
                                                     variant="link"
                                                     size="sm"
                                                 >
                                                     Ver
                                                 </Button>
                                                 <Button
-                                                    as="link"
-                                                    href={`/funcionarios/${f.id}/edit`}
+                                                    render={<Link href={`/funcionarios/${f.id}/edit`} />}
                                                     variant="link"
                                                     size="sm"
                                                 >
                                                     Editar
                                                 </Button>
                                                 <Button
-                                                    variant={f.ativo ? "link-danger" : "link"}
+                                                    variant="link"
                                                     size="sm"
+                                                    className={
+                                                        f.ativo
+                                                            ? "text-destructive hover:text-destructive"
+                                                            : ""
+                                                    }
                                                     onClick={() => {
-                                                        const acao = f.ativo ? "inativar" : "ativar";
-                                                        if (confirm(`Deseja ${acao} ${f.nome}?`)) {
-                                                            router.patch(`/funcionarios/${f.id}/inativar`, {}, { preserveScroll: true });
+                                                        const acao = f.ativo
+                                                            ? "inativar"
+                                                            : "ativar";
+                                                        if (
+                                                            confirm(
+                                                                `Deseja ${acao} ${f.nome}?`,
+                                                            )
+                                                        ) {
+                                                            router.patch(
+                                                                `/funcionarios/${f.id}/inativar`,
+                                                                {},
+                                                                {
+                                                                    preserveScroll: true,
+                                                                },
+                                                            );
                                                         }
                                                     }}
                                                 >
                                                     {f.ativo ? "Inativar" : "Ativar"}
                                                 </Button>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </AppLayout>
     );
 };

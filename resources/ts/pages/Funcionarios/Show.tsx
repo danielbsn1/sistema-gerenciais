@@ -1,14 +1,24 @@
 // resources/ts/pages/Funcionarios/Show.tsx
-// resources/ts/pages/Funcionarios/Show.tsx
 import { FC } from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
-import Badge from "../../components/ui/Input";
-import { Card, CardHeader, CardBody } from "../../components/ui/Modal";
+import { Link, router } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "../../components/StatusBadge";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from "@/components/ui/card";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Funcionario, Emprestimo } from "../../types/funcionarios";
-import "../../styles/showeq.css";
-import "../../styles/equipamentos.css";
 
 interface Props {
     funcionario: Funcionario & { ativo: boolean };
@@ -18,134 +28,148 @@ interface Props {
 const FuncionariosShow: FC<Props> = ({ funcionario, historico }) => {
     return (
         <AppLayout title="Funcionários">
-            <div className="page-header">
-                <div className="page-header__info">
-                    <h2>{funcionario.nome}</h2>
-                    <p>{funcionario.cpf}</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        {funcionario.nome}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        {funcionario.cpf}
+                    </p>
                 </div>
-                <div className="page-header__actions">
-                    <Button as="link" href="/funcionarios" variant="secondary" size="sm">
-                        ← Voltar
+                <div className="flex gap-2">
+                    <Button render={<Link href="/funcionarios" />} variant="outline">
+                        Voltar
                     </Button>
                     <Button
-                        variant={funcionario.ativo ? "danger" : "primary"}
-                        size="sm"
+                        variant={funcionario.ativo ? "destructive" : "default"}
                         onClick={() => {
-                            const acao = funcionario.ativo ? "inativar" : "ativar";
+                            const acao = funcionario.ativo
+                                ? "inativar"
+                                : "ativar";
                             if (confirm(`Deseja ${acao} este funcionário?`)) {
-                                router.patch(`/funcionarios/${funcionario.id}/inativar`);
+                                router.patch(
+                                    `/funcionarios/${funcionario.id}/inativar`,
+                                );
                             }
                         }}
                     >
                         {funcionario.ativo ? "Inativar" : "Ativar"}
                     </Button>
-                    <Button as="link" href={`/funcionarios/${funcionario.id}/edit`} variant="primary" size="sm">
+                    <Button
+                        render={
+                            <Link href={`/funcionarios/${funcionario.id}/edit`} />
+                        }
+                    >
                         Editar
                     </Button>
                 </div>
             </div>
 
-            <Card style={{ marginBottom: 20 }}>
-                <CardHeader title="Dados do Funcionário" />
-                <CardBody>
-                    <div className="detail-grid">
-                        <div className="detail-item">
-                            <span className="detail-label">Nome</span>
-                            <span className="detail-value">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Dados do Funcionário</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Nome
+                            </span>
+                            <span className="text-sm font-medium">
                                 {funcionario.nome}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">CPF</span>
-                            <span
-                                className="detail-value"
-                                style={{ fontFamily: "monospace" }}
-                            >
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                CPF
+                            </span>
+                            <span className="text-sm font-medium">
                                 {funcionario.cpf}
                             </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Setor</span>
-                            <div style={{ marginTop: 4 }}>
-                                <span className="chip">
-                                    {funcionario.setor}
-                                </span>
-                            </div>
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Setor
+                            </span>
+                            <span className="text-sm font-medium">
+                                {funcionario.setor}
+                            </span>
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Tipo</span>
-                            <div style={{ marginTop: 4 }}>
-                                <Badge variant={funcionario.tipo} />
-                            </div>
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                Tipo
+                            </span>
+                            <StatusBadge status={funcionario.tipo} />
                         </div>
-                        <div className="detail-item">
-                            <span className="detail-label">
+                        <div className="grid gap-1">
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                 Equipamento Atual
                             </span>
-                            <span className="detail-value">
+                            <span className="text-sm font-medium">
                                 {funcionario.equipamento_atual ?? "—"}
                             </span>
                         </div>
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
 
             <Card>
-                <CardHeader title="Histórico de Empréstimos" />
-                <div className="table-wrapper">
-                    <table className="table">
-                        <thead>
+                <CardHeader>
+                    <CardTitle>Histórico de Empréstimos</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <tr>
-                                <th>Equipamento</th>
-                                <th>ID Patrimônio</th>
-                                <th>Início</th>
-                                <th>Devolução</th>
-                                <th>Status</th>
+                                <TableHead>Equipamento</TableHead>
+                                <TableHead>ID Patrimônio</TableHead>
+                                <TableHead>Início</TableHead>
+                                <TableHead>Devolução</TableHead>
+                                <TableHead>Status</TableHead>
                             </tr>
-                        </thead>
-                        <tbody>
+                        </TableHeader>
+                        <TableBody>
                             {historico.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} className="table__empty">
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={5}
+                                        className="text-center text-muted-foreground"
+                                    >
                                         Nenhum empréstimo registrado.
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 historico.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>
+                                    <TableRow key={emp.id}>
+                                        <TableCell>
                                             {emp.equipamento.marca}{" "}
                                             {emp.equipamento.modelo}
-                                        </td>
-                                        <td
-                                            style={{
-                                                fontFamily: "monospace",
-                                                fontSize: 13,
-                                            }}
-                                        >
-                                            #{emp.equipamento.id_patrimonio}
-                                        </td>
-                                        <td>
+                                        </TableCell>
+                                        <TableCell className="font-mono text-[13px]">
+                                            #{emp.equipamento.patrimonio_id}
+                                        </TableCell>
+                                        <TableCell>
                                             {new Date(
                                                 emp.data_inicio,
                                             ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td>
+                                        </TableCell>
+                                        <TableCell>
                                             {emp.data_devolucao
                                                 ? new Date(
                                                       emp.data_devolucao,
                                                   ).toLocaleDateString("pt-BR")
                                                 : "—"}
-                                        </td>
-                                        <td>
-                                            <Badge variant={emp.status} />
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={emp.status} />
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
-                </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
             </Card>
         </AppLayout>
     );

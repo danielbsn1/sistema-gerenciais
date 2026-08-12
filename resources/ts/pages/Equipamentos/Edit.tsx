@@ -1,14 +1,25 @@
 // resources/ts/pages/Equipamentos/Edit.tsx
 import { FC } from "react";
-import { useForm } from "@inertiajs/react";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../components/ui/Button";
+import { Link, useForm } from "@inertiajs/react";
+import AppLayout from "../../components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardHeader,
-    CardBody,
+    CardTitle,
+    CardDescription,
+    CardContent,
     CardFooter,
-} from "../../components/ui/Modal";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Field } from "@/components/Field";
 import { Equipamento } from "../../types/funcionarios";
 
 interface Props {
@@ -16,13 +27,13 @@ interface Props {
 }
 
 const TIPOS = [
-    "Notebook",
-    "Desktop",
-    "Monitor",
-    "Tablet",
-    "Celular",
-    "Impressora",
-    "Outros",
+    { value: "notebook", label: "Notebook" },
+    { value: "desktop", label: "Desktop" },
+    { value: "monitor", label: "Monitor" },
+    { value: "tablet", label: "Tablet" },
+    { value: "celular", label: "Celular" },
+    { value: "impressora", label: "Impressora" },
+    { value: "outros", label: "Outros" },
 ];
 const STATUS = [
     { value: "disponivel", label: "Disponível" },
@@ -32,7 +43,7 @@ const STATUS = [
 
 const EquipamentosEdit: FC<Props> = ({ equipamento }) => {
     const { data, setData, put, processing, errors } = useForm({
-        id_patrimonio: equipamento.id_patrimonio,
+        patrimonio_id: equipamento.patrimonio_id,
         tipo: equipamento.tipo,
         marca: equipamento.marca,
         modelo: equipamento.modelo,
@@ -46,138 +57,106 @@ const EquipamentosEdit: FC<Props> = ({ equipamento }) => {
 
     return (
         <AppLayout title="Equipamentos">
-            <Card>
-                <CardHeader
-                    title="Editar Equipamento"
-                    subtitle={`#${equipamento.id_patrimonio} — ${equipamento.marca} ${equipamento.modelo}`}
-                />
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Editar Equipamento
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        #{equipamento.patrimonio_id} — {equipamento.marca}{" "}
+                        {equipamento.modelo}
+                    </p>
+                </div>
+                <Button render={<Link href="/equipamentos" />} variant="outline">
+                    Voltar
+                </Button>
+            </div>
 
-                <CardBody>
-                    <form
-                        onSubmit={handleSubmit}
-                        className="form"
-                        id="edit-form"
-                    >
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    ID Patrimônio
-                                </label>
-                                <input
-                                    className={`form-input ${errors.id_patrimonio ? "is-error" : ""}`}
-                                    value={data.id_patrimonio}
+            <Card className="mx-auto max-w-3xl">
+                <form onSubmit={handleSubmit} id="edit-form">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <Field
+                                label="ID Patrimônio"
+                                required
+                                error={errors.patrimonio_id}
+                            >
+                                <Input
+                                    value={data.patrimonio_id}
                                     onChange={(e) =>
-                                        setData("id_patrimonio", e.target.value)
+                                        setData("patrimonio_id", e.target.value)
                                     }
+                                    aria-invalid={!!errors.patrimonio_id}
                                 />
-                                {errors.id_patrimonio && (
-                                    <span className="form-error">
-                                        {errors.id_patrimonio}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Tipo
-                                </label>
-                                <select
-                                    className={`form-select ${errors.tipo ? "is-error" : ""}`}
-                                    value={data.tipo}
-                                    onChange={(e) =>
-                                        setData("tipo", e.target.value)
+                            <Field label="Tipo" required error={errors.tipo}>
+                                <Select
+                                    value={data.tipo || null}
+                                    onValueChange={(value) =>
+                                        setData("tipo", value ?? "")
                                     }
                                 >
-                                    <option value="">Selecione...</option>
-                                    {TIPOS.map((t) => (
-                                        <option key={t} value={t}>
-                                            {t}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.tipo && (
-                                    <span className="form-error">
-                                        {errors.tipo}
-                                    </span>
-                                )}
-                            </div>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Selecione..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {TIPOS.map((t) => (
+                                            <SelectItem key={t.value} value={t.value}>
+                                                {t.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Marca
-                                </label>
-                                <input
-                                    className={`form-input ${errors.marca ? "is-error" : ""}`}
+                            <Field label="Marca" required error={errors.marca}>
+                                <Input
                                     value={data.marca}
-                                    onChange={(e) =>
-                                        setData("marca", e.target.value)
-                                    }
+                                    onChange={(e) => setData("marca", e.target.value)}
+                                    aria-invalid={!!errors.marca}
                                 />
-                                {errors.marca && (
-                                    <span className="form-error">
-                                        {errors.marca}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Modelo
-                                </label>
-                                <input
-                                    className={`form-input ${errors.modelo ? "is-error" : ""}`}
+                            <Field label="Modelo" required error={errors.modelo}>
+                                <Input
                                     value={data.modelo}
-                                    onChange={(e) =>
-                                        setData("modelo", e.target.value)
-                                    }
+                                    onChange={(e) => setData("modelo", e.target.value)}
+                                    aria-invalid={!!errors.modelo}
                                 />
-                                {errors.modelo && (
-                                    <span className="form-error">
-                                        {errors.modelo}
-                                    </span>
-                                )}
-                            </div>
+                            </Field>
 
-                            <div className="form-group">
-                                <label className="form-label form-label--required">
-                                    Status
-                                </label>
-                                <select
-                                    className={`form-select ${errors.status ? "is-error" : ""}`}
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        setData("status", e.target.value as any)
+                            <Field label="Status" required error={errors.status}>
+                                <Select
+                                    value={data.status || null}
+                                    onValueChange={(value) =>
+                                        setData("status", value as any)
                                     }
                                 >
-                                    {STATUS.map((s) => (
-                                        <option key={s.value} value={s.value}>
-                                            {s.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.status && (
-                                    <span className="form-error">
-                                        {errors.status}
-                                    </span>
-                                )}
-                            </div>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Selecione..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {STATUS.map((s) => (
+                                            <SelectItem key={s.value} value={s.value}>
+                                                {s.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </Field>
                         </div>
-                    </form>
-                </CardBody>
+                    </CardContent>
 
-                <CardFooter>
-                    <Button as="link" href="/equipamentos" variant="secondary">
-                        Cancelar
-                    </Button>
-                    <Button
-                        type="submit"
-                        form="edit-form"
-                        variant="primary"
-                        disabled={processing}
-                    >
-                        {processing ? "Salvando..." : "Salvar Alterações"}
-                    </Button>
-                </CardFooter>
+                    <CardFooter className="justify-end gap-2">
+                        <Button render={<Link href="/equipamentos" />} variant="outline">
+                            Cancelar
+                        </Button>
+                        <Button type="submit" form="edit-form" disabled={processing}>
+                            {processing ? "Salvando..." : "Salvar Alterações"}
+                        </Button>
+                    </CardFooter>
+                </form>
             </Card>
         </AppLayout>
     );
