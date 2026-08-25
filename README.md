@@ -230,6 +230,9 @@ Siga o passo a passo completo (VPS Hostinger com Pix, SSL, backups) em [**DEPLOY
 
 ---
 
+## Manual 
+https://asset-manager-manual-3paq.vercel.app/
+
 ## Autor
 
 Desenvolvido por **Daniel**
