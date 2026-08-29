@@ -1,4 +1,4 @@
-# sistema-gerenciais
+# management-systems
 
 Sistema web para gerenciamento de patrimônio empresarial: controle de **equipamentos**, **funcionários**, **empréstimos** e **solicitações**, com painel de relatórios e notificações.
 
